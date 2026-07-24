@@ -1,0 +1,22 @@
+# Binaries & build artifacts
+/build/
+/agencypulse
+/agencypulse.exe
+cmd/agencypulse/agencypulse
+cmd/agencypulse/agencypulse.exe
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Local configuration & database
+config.ini
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# OS & Editor files
+.DS_Store
+Thumbs.db

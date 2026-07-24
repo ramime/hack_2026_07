@@ -1,0 +1,10 @@
+; AgencyPulse Configuration Sample
+[server]
+port = 8080
+env = development
+
+[database]
+path = agencypulse.db
+
+[i18n]
+default_language = de
