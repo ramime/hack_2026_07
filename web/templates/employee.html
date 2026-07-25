@@ -7,11 +7,11 @@
 
 <div class="card">
   <h2 class="card-title">⏱️ {{ t .Lang "log_time_heading" }}</h2>
-  <form hx-post="/api/time-logs" hx-target="#main-content" hx-swap="innerHTML">
+  <form hx-post="/api/time-logs" hx-target="#main-content" hx-swap="innerHTML" data-testid="time-log-form">
     <div class="form-grid">
       <div class="form-group">
         <label for="employee_id">{{ t .Lang "select_employee" }}</label>
-        <select id="employee_id" name="employee_id" class="form-control" required>
+        <select id="employee_id" name="employee_id" class="form-control" data-testid="employee-select" required>
           {{ range .Employees }}
           <option value="{{ .ID }}">{{ .Name }} ({{ .Role }})</option>
           {{ end }}
@@ -20,7 +20,7 @@
 
       <div class="form-group">
         <label for="campaign_id">{{ t .Lang "select_campaign" }}</label>
-        <select id="campaign_id" name="campaign_id" class="form-control" required>
+        <select id="campaign_id" name="campaign_id" class="form-control" data-testid="campaign-select" required>
           {{ range .Campaigns }}
           <option value="{{ .ID }}">{{ .ClientName }} — {{ .Name }}</option>
           {{ end }}
@@ -29,16 +29,16 @@
 
       <div class="form-group">
         <label for="hours">{{ t .Lang "hours_label" }}</label>
-        <input type="number" id="hours" name="hours" step="0.25" min="0.25" max="24" class="form-control" placeholder="2.5" required>
+        <input type="number" id="hours" name="hours" step="0.25" min="0.25" max="24" class="form-control" data-testid="hours-input" placeholder="2.5" required>
       </div>
 
       <div class="form-group" style="grid-column: 1 / -1;">
         <label for="description">{{ t .Lang "description_label" }}</label>
-        <input type="text" id="description" name="description" class="form-control" placeholder="Storyboards, motion graphics, client call..." required>
+        <input type="text" id="description" name="description" class="form-control" data-testid="description-input" placeholder="Storyboards, motion graphics, client call..." required>
       </div>
 
       <div class="form-group" style="grid-column: 1 / -1; align-items: flex-end;">
-        <button type="submit" class="btn-primary">
+        <button type="submit" class="btn-primary" data-testid="submit-time-log">
           {{ t .Lang "btn_submit_time" }} →
         </button>
       </div>
@@ -48,7 +48,7 @@
 
 <div class="card">
   <h2 class="card-title">📋 {{ t .Lang "recent_entries_heading" }}</h2>
-  <div class="table-responsive">
+  <div class="table-responsive" data-testid="time-log-table">
     <table>
       <thead>
         <tr>

@@ -1,18 +1,15 @@
-# RELEASE_NOTES.md — AgencyPulse v0.1.0
+# RELEASE_NOTES.md — AgencyPulse v0.1.1
 
 **Release Date:** 2026-07-25  
-**Milestone:** Foundation & Time Tracking (`v0.1.0`)
+**Milestone:** Pitch Media Boundary Patch (`v0.1.1`)
 
 ---
 
 ## 🎯 Release Summary
 
-The `v0.1.0` release establishes the database foundation, multi-language support (i18n), pitch storytelling seed data, glassmorphic dark mode styling, and HTMX reactive time tracking.
+The `v0.1.1` release introduces stable UI testing selectors (`data-testid`), an automated health check API endpoint (`GET /api/health`), and formal alignment with the Pitch Media pipeline boundary.
 
-### Key Highlights in v0.1.0:
-- **Pure Go SQLite Integration**: `modernc.org/sqlite` database layer with schema migrations and seed data initialization.
-- **Pitch Storytelling Seed Data**: Pre-loaded clients and campaigns (Ritter Sport = Green, Bosch = Yellow, Porsche = Red) with historical time logs.
-- **Dark Mode Glassmorphic UI**: High-contrast, sleek design system (`web/static/styles.css`) using custom CSS tokens.
-- **Reactive HTMX Time Entry**: Form for logging hours per employee & campaign with dynamic table updates without page reloads.
-- **Language Switcher (i18n)**: Seamless German (`DE`) & English (`EN`) UI translation toggling.
-- **1-Click Demo Reset**: Endpoint (`POST /api/reset-demo-data`) to instantly restore seed state during live pitch presentations.
+### Key Highlights in v0.1.1:
+- **Health Check API**: `GET /api/health` returning JSON `{"ok": true, "version": "0.1.1"}` for automated orchestration.
+- **Stable UI Selectors**: Added `data-testid` attributes to all forms, inputs, buttons, and tables to support Playwright automated screencast recording.
+- **Pitch Contract Alignment**: Fully aligned `pitch/manifest.yaml` with shipped application routes and entrypoints.

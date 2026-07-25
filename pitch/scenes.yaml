@@ -1,0 +1,60 @@
+# OWNER: Pitch Media pipeline ONLY — Dev-Agent: DO NOT EDIT
+# Screencast scenes + English narration (burned-in captions).
+# Feature inventory comes from pitch/manifest.yaml (Dev-Agent).
+# See: pitch/DEV_AGENT_CONTRACT.md
+
+version: "0.2.0-beta.1"
+lang: en
+viewport:
+  width: 1280
+  height: 720
+
+scenes:
+  - id: intro
+    path: "/"
+    max_seconds: 8
+    narration_en: "AgencyPulse — real-time budget pulse for social media agencies."
+    steps: []
+
+  - id: time_entry
+    path: "/"
+    max_seconds: 25
+    narration_en: "Employees log hours against client campaigns. The table updates instantly."
+    steps:
+      - action: set_caption
+      - action: select
+        testid: employee-select
+        label_contains: "Sarah"
+      - action: select
+        testid: campaign-select
+        label_contains: "Ritter"
+      - action: fill
+        testid: hours-input
+        value: "1.5"
+      - action: fill
+        testid: description-input
+        value: "Storyboard review"
+      - action: click
+        testid: submit-time-log
+      - action: wait
+        ms: 1500
+
+  - id: demo_story
+    path: "/"
+    max_seconds: 20
+    narration_en: "Seeded pitch data: Ritter Sport healthy, Bosch at risk, Porsche over budget."
+    steps:
+      - action: click
+        testid: campaign-select
+      - action: wait
+        ms: 2000
+
+  - id: reset
+    path: "/"
+    max_seconds: 12
+    narration_en: "One click restores the demo baseline for the next pitch."
+    steps:
+      - action: click
+        testid: reset-demo-button
+      - action: wait
+        ms: 1500

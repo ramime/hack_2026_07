@@ -29,7 +29,9 @@ fi
 
 echo "==> Merging '${CURRENT_BRANCH}' onto 'public-release' with --squash..."
 git checkout public-release
-git merge "$CURRENT_BRANCH" --squash --allow-unrelated-histories -m "Release ${VERSION_TAG}: AgencyPulse MVP"
+git merge "$CURRENT_BRANCH" --squash --allow-unrelated-histories -m "Release ${VERSION_TAG}: AgencyPulse MVP" || true
+git checkout "$CURRENT_BRANCH" -- .
+git commit -m "Release ${VERSION_TAG}: AgencyPulse MVP" || true
 
 echo "==> Setting tag ${VERSION_TAG}..."
 git tag -a -f "${VERSION_TAG}" -m "Public Release ${VERSION_TAG}"

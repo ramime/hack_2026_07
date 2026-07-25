@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
@@ -13,7 +14,7 @@ import (
 	"agencypulse/internal/models"
 )
 
-const version = "0.1.0"
+const version = "0.1.1"
 
 type PageData struct {
 	Version    string
@@ -226,6 +227,16 @@ func main() {
 		}
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
+	})
+
+	// Route: GET /api/health
+	http.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]any{
+			"ok":      true,
+			"version": version,
+		})
 	})
 
 	// Route: POST /api/set-language

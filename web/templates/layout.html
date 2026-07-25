@@ -24,13 +24,13 @@
     </a>
 
     <div class="header-controls">
-      <button id="theme-toggle-btn" type="button" class="theme-toggle" onclick="toggleTheme()" title="Theme Switcher">
+      <button id="theme-toggle-btn" type="button" class="theme-toggle" data-testid="theme-toggle" onclick="toggleTheme()" title="Theme Switcher">
         <span id="theme-toggle-icon">🌙</span> <span id="theme-toggle-text">Dark</span>
       </button>
 
       <form hx-post="/api/set-language">
         <input type="hidden" name="lang" value="{{ if eq .Lang "de" }}en{{ else }}de{{ end }}">
-        <button type="submit" class="lang-toggle">
+        <button type="submit" class="lang-toggle" data-testid="lang-toggle">
           🌐 {{ if eq .Lang "de" }}EN{{ else }}DE{{ end }}
         </button>
       </form>
@@ -45,7 +45,7 @@
     <div class="footer-left">
       <span>AgencyPulse &copy; 2026 Social Media Hackathon</span>
       <form hx-post="/api/reset-demo-data" hx-target="#main-content" hx-swap="innerHTML" style="display: inline-block;">
-        <button type="submit" class="btn-subtle" title="{{ t .Lang "reset_demo" }}">
+        <button type="submit" class="btn-subtle" data-testid="reset-demo-button" title="{{ t .Lang "reset_demo" }}">
           ⚡ {{ t .Lang "reset_demo" }}
         </button>
       </form>

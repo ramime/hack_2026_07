@@ -2,7 +2,12 @@
 
 All notable changes to AgencyPulse will be documented in this file.
 
----
+## [v0.1.1] — 2026-07-25 (Pitch Media Boundary & Health API Patch)
+### Added
+- Health check HTTP endpoint (`GET /api/health`) returning JSON status and SemVer version.
+- Stable `data-testid` attributes across HTML templates (`layout.html`, `employee.html`) for Playwright automated pitch recording.
+- Pitch contract documentation and manifest synchronization (`pitch/manifest.yaml`).
+- Unit test suite for API endpoints (`cmd/agencypulse/main_test.go`).
 
 ## [v0.1.0] — 2026-07-25 (Foundation & Time Tracking Release)
 ### Added

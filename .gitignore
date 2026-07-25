@@ -19,6 +19,9 @@ config.ini
 *.sqlite3
 *.log
 
+# Pitch media pipeline outputs (video/audio)
+/artifacts/
+
 # OS & Editor files
 .DS_Store
 Thumbs.db
