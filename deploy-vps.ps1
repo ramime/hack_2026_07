@@ -15,7 +15,7 @@ Remove-Item Env:\GOOS
 Remove-Item Env:\GOARCH
 
 Write-Host "==> Creating remote directory structure on VPS..." -ForegroundColor Green
-ssh "${VpsUser}@${VpsHost}" "mkdir -p ${VpsPath}/bin ${VpsPath}/web ${VpsPath}/locales"
+ssh "${VpsUser}@${VpsHost}" "mkdir -p ${VpsPath}/bin ${VpsPath}/web ${VpsPath}/locales ${VpsPath}/pitch"
 
 Write-Host "==> Stopping service on VPS..." -ForegroundColor Green
 ssh "${VpsUser}@${VpsHost}" "sudo systemctl stop agencypulse 2>/dev/null || true"
@@ -24,6 +24,8 @@ Write-Host "==> Deploying binary and assets to VPS via SCP..." -ForegroundColor 
 scp build/agencypulse "${VpsUser}@${VpsHost}:${VpsPath}/bin/agencypulse"
 if (Test-Path "web") { scp -r web "${VpsUser}@${VpsHost}:${VpsPath}/" }
 if (Test-Path "locales") { scp -r locales "${VpsUser}@${VpsHost}:${VpsPath}/" }
+# Pitch deck markdown for GET /slides (pitch/slides.md)
+if (Test-Path "pitch") { scp -r pitch "${VpsUser}@${VpsHost}:${VpsPath}/" }
 
 Write-Host "==> Restarting service on VPS..." -ForegroundColor Green
 ssh "${VpsUser}@${VpsHost}" "sudo systemctl start agencypulse 2>/dev/null || sudo systemctl restart agencypulse 2>/dev/null || echo 'Service start skipped'"

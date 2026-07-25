@@ -1,6 +1,6 @@
 # OWNER: Dev-Agent only — see pitch/DEV_AGENT_CONTRACT.md
 # Pitch pipeline reads this file; do not put Playwright scripts here.
-version: "0.1.2"
+version: "0.1.3"
 updated_at: "2026-07-25"
 
 features:

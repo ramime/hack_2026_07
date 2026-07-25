@@ -25,6 +25,8 @@ Instructions for deploying AgencyPulse to a Linux (Kubuntu) VPS.
 .\deploy-vps.ps1
 ```
 
+The scripts cross-compile the Linux binary and copy `web/`, `locales/`, and `pitch/` (for `GET /slides`) to `/opt/agencypulse`.
+
 ---
 
 ## ⚙️ systemd Service Configuration

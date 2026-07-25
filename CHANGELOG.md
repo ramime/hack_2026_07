@@ -2,6 +2,11 @@
 
 All notable changes to AgencyPulse will be documented in this file.
 
+## [v0.1.3] — 2026-07-25 (Pitch Deck Deployment Patch)
+### Added
+- Deployment script support (`deploy-vps.sh` and `deploy-vps.ps1`) for copying `pitch/` directory assets to VPS (`/opt/agencypulse/pitch`).
+- Updated `DEPLOYMENT.md` documentation.
+
 ## [v0.1.2] — 2026-07-25 (Slides Footer Link Patch)
 ### Added
 - Subtle `/slides` navigation link in application footer (`layout.html`) with `data-testid="slides-link"`.

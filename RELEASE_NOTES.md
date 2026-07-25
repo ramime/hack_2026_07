@@ -1,14 +1,14 @@
-# RELEASE_NOTES.md — AgencyPulse v0.1.2
+# RELEASE_NOTES.md — AgencyPulse v0.1.3
 
 **Release Date:** 2026-07-25  
-**Milestone:** Slides Navigation Link Patch (`v0.1.2`)
+**Milestone:** Pitch Deck Deployment Patch (`v0.1.3`)
 
 ---
 
 ## 🎯 Release Summary
 
-The `v0.1.2` patch release adds a subtle `/slides` navigation link to the application footer bar with Playwright selector support (`data-testid="slides-link"`).
+The `v0.1.3` patch release updates the deployment scripts (`deploy-vps.sh` & `deploy-vps.ps1`) to automatically deploy the `pitch/` directory assets (including `pitch/slides.md`) to the VPS environment (`/opt/agencypulse/pitch`).
 
-### Key Highlights in v0.1.2:
-- **Slides Footer Link**: Added `📊 Slides` link in footer for one-click access to the in-app pitch slideshow.
-- **i18n Localization**: Localized navigation label across German and English dictionaries.
+### Key Highlights in v0.1.3:
+- **Pitch Asset Synchronization**: Automated copying of the `pitch/` folder during deployment for `GET /slides` serving.
+- **Documentation Updates**: Updated `DEPLOYMENT.md` to document the remote directory structure.
