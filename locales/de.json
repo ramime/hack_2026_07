@@ -68,6 +68,17 @@
   "th_billing_rate": "Stundensatz (€/h)",
   "audio_briefing_title": "🔊 ElevenLabs Voice Briefing",
   "audio_briefing_desc": "Generiert ein automatisches 15-Sekunden Audio-Briefing zur aktuellen finanziellen Lage.",
-  "play_audio_briefing": "🔊 Briefing abspielen"
+  "play_audio_briefing": "🔊 Briefing abspielen",
+  "kiosk_title": "800x480 Hardware Touch Quick-Tracker",
+  "kiosk_subtitle": "Blitzschnelles Time-Tracking für Raspberry Pi Touchscreens",
+  "active_timer": "Aktive Stoppuhr",
+  "btn_start_timer": "▶ START",
+  "btn_stop_timer": "⏹ STOPP & BUCHEN",
+  "back_to_dashboard": "← Dashboard",
+  "select_active_employee": "Mitarbeiter wählen",
+  "preset_video": "🎬 Video Cut",
+  "preset_design": "🎨 Design & Assets",
+  "preset_concept": "💡 Konzept",
+  "preset_meeting": "📞 Meeting"
 }
 

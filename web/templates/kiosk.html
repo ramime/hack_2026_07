@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="{{ .Lang }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>{{ t .Lang "kiosk_title" }} — AgencyPulse</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0b0f19;
+      color: #f3f4f6;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      overflow-x: hidden;
+    }
+
+    .kiosk-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0.75rem;
+      box-sizing: border-box;
+      min-height: 480px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .kiosk-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 0.75rem;
+    }
+
+    .kiosk-nav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--text-muted, #9ca3af);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.4rem 0.75rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .kiosk-title-badge {
+      font-size: 1rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .emp-selector-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 0.25rem 0.6rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .emp-selector-pill select {
+      background: transparent;
+      color: #ffffff;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .kiosk-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      flex: 1;
+    }
+
+    @media (max-width: 700px) {
+      .kiosk-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .kiosk-card {
+      background: #111827;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .kiosk-card.active {
+      border-color: #10b981;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+      animation: pulse-neon 1.8s infinite;
+      background: linear-gradient(180deg, #111827 0%, rgba(16, 185, 129, 0.08) 100%);
+    }
+
+    @keyframes pulse-neon {
+      0% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+      50% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.5); }
+      100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+    }
+
+    .kiosk-client-name {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .kiosk-campaign-name {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0.2rem 0 0.5rem 0;
+      line-height: 1.25;
+    }
+
+    .preset-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .preset-pill {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.25rem 0.45rem;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #d1d5db;
+      cursor: pointer;
+    }
+
+    .preset-pill.active {
+      background: #6366f1;
+      color: #ffffff;
+      border-color: #818cf8;
+    }
+
+    .stopwatch-digital {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1.75rem;
+      font-weight: 900;
+      color: #10b981;
+      text-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+      text-align: center;
+      margin: 0.4rem 0;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-kiosk-start {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-kiosk-stop {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+
+    .kiosk-metric-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="kiosk-container" id="kiosk-content">
+    {{ template "kiosk_cards" . }}
+  </div>
+
+  <script>
+    // Audio Chime Synthesizer using Web Audio API
+    function playChime(isStart) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (isStart) {
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+          osc.frequency.exponentialRampToValueAtTime(659.25, ctx.currentTime + 0.15); // E5
+        } else {
+          osc.frequency.setValueAtTime(659.25, ctx.currentTime); // E5
+          osc.frequency.exponentialRampToValueAtTime(440.0, ctx.currentTime + 0.2); // A4
+        }
+
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+      } catch (e) {
+        console.log('Audio chime unavailable:', e);
+      }
+    }
+
+    // Live Digital Stopwatch Interval
+    let timerInterval = null;
+
+    function startLiveStopwatches() {
+      if (timerInterval) clearInterval(timerInterval);
+
+      timerInterval = setInterval(() => {
+        const activeCards = document.querySelectorAll('[data-started-at]');
+        const nowSec = Math.floor(Date.now() / 1000);
+
+        activeCards.forEach(card => {
+          const startedAt = parseInt(card.getAttribute('data-started-at'), 10);
+          if (startedAt > 0) {
+            const elapsed = Math.max(0, nowSec - startedAt);
+            const hrs = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+            const mins = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+            const secs = String(elapsed % 60).padStart(2, '0');
+            
+            const timerEl = card.querySelector('.stopwatch-digital');
+            if (timerEl) {
+              timerEl.textContent = `${hrs}:${mins}:${secs}`;
+            }
+          }
+        });
+      }, 1000);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      startLiveStopwatches();
+    });
+
+    document.body.addEventListener("htmx:afterSwap", () => {
+      startLiveStopwatches();
+    });
+  </script>
+</body>
+</html>
+
+{{ define "kiosk_cards" }}
+<div class="kiosk-header">
+  <a href="/" class="kiosk-nav-back" data-testid="kiosk-back">
+    {{ t .Lang "back_to_dashboard" }}
+  </a>
+
+  <div class="kiosk-title-badge">
+    📱 800x480 Kiosk
+  </div>
+
+  <div class="emp-selector-pill">
+    <span style="font-size: 0.75rem; color: #9ca3af;">👤</span>
+    <select name="employee_id" hx-get="/tracker" hx-target="#kiosk-content" hx-swap="innerHTML" data-testid="kiosk-emp-select">
+      {{ range .Employees }}
+      <option value="{{ .ID }}" {{ if eq .ID $.ActiveEmpID }}selected{{ end }}>
+        {{ .Name }} ({{ .Role }})
+      </option>
+      {{ end }}
+    </select>
+  </div>
+</div>
+
+<div class="kiosk-grid">
+  {{ range .Cards }}
+  <div class="kiosk-card {{ if .IsActive }}active{{ end }}" {{ if .IsActive }}data-started-at="{{ .StartedAtUnix }}"{{ end }}>
+    <div>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="kiosk-client-name">{{ .ClientName }}</span>
+        <span class="badge {{ if eq .Status "ok" }}badge-green{{ else if eq .Status "warning" }}badge-yellow{{ else }}badge-red{{ end }}">
+          {{ printf "%.0f" .UsagePercent }}%
+        </span>
+      </div>
+
+      <h2 class="kiosk-campaign-name">{{ .CampaignName }}</h2>
+
+      <!-- Activity Preset Pills -->
+      <div class="preset-pills">
+        <button type="button" class="preset-pill {{ if eq .TaskCategory "Content & Editing" }}active{{ end }}" onclick="selectCategory(this, {{ .CampaignID }}, 'Content & Editing')">
+          🎬 Video Cut
+        </button>
+        <button type="button" class="preset-pill {{ if eq .TaskCategory "Design & Assets" }}active{{ end }}" onclick="selectCategory(this, {{ .CampaignID }}, 'Design & Assets')">
+          🎨 Design
+        </button>
+        <button type="button" class="preset-pill {{ if eq .TaskCategory "Strategy & Concept" }}active{{ end }}" onclick="selectCategory(this, {{ .CampaignID }}, 'Strategy & Concept')">
+          💡 Konzept
+        </button>
+        <button type="button" class="preset-pill {{ if eq .TaskCategory "Meeting & Coordination" }}active{{ end }}" onclick="selectCategory(this, {{ .CampaignID }}, 'Meeting & Coordination')">
+          📞 Meeting
+        </button>
+      </div>
+    </div>
+
+    <div>
+      {{ if .IsActive }}
+        <div class="stopwatch-digital">00:00:00</div>
+        <input type="hidden" id="category-{{ .CampaignID }}" value="{{ .TaskCategory }}">
+        <button type="button" class="btn-kiosk-stop" 
+                hx-post="/api/kiosk/stop" 
+                hx-vals='{"campaign_id": {{ .CampaignID }}, "employee_id": {{ $.ActiveEmpID }}}'
+                hx-target="#kiosk-content" 
+                hx-swap="innerHTML"
+                onclick="playChime(false)"
+                data-testid="kiosk-stop-btn">
+          {{ t $.Lang "btn_stop_timer" }}
+        </button>
+      {{ else }}
+        <div class="kiosk-metric-row">
+          <span>Ziel: € {{ printf "%.0f" .TargetBudget }}</span>
+          <span>Ist: € {{ printf "%.0f" .ActualSpend }}</span>
+        </div>
+        <input type="hidden" id="category-{{ .CampaignID }}" value="{{ .TaskCategory }}">
+        <button type="button" class="btn-kiosk-start" 
+                hx-post="/api/kiosk/start" 
+                hx-vals='js:{"campaign_id": {{ .CampaignID }}, "employee_id": {{ $.ActiveEmpID }}, "task_category": document.getElementById("category-{{ .CampaignID }}").value}'
+                hx-target="#kiosk-content" 
+                hx-swap="innerHTML"
+                onclick="playChime(true)"
+                data-testid="kiosk-start-btn">
+          {{ t $.Lang "btn_start_timer" }}
+        </button>
+      {{ end }}
+    </div>
+  </div>
+  {{ end }}
+</div>
+
+<script>
+  function selectCategory(btn, campaignId, category) {
+    const parent = btn.closest('.preset-pills');
+    parent.querySelectorAll('.preset-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const input = document.getElementById('category-' + campaignId);
+    if (input) input.value = category;
+  }
+</script>
+{{ end }}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"strconv"
@@ -17,7 +18,15 @@ import (
 	"agencypulse/internal/tts"
 )
 
-const version = "0.3.0"
+const version = "0.4.0"
+
+type KioskPageData struct {
+	Version     string
+	Lang        string
+	ActiveEmpID int64
+	Employees   []models.Employee
+	Cards       []models.KioskCard
+}
 
 
 type PageData struct {
@@ -80,6 +89,11 @@ func main() {
 		log.Fatalf("Failed to parse executive templates: %v", err)
 	}
 
+	kioskTmpl, err := template.New("kiosk.html").Funcs(funcMap).ParseFiles("web/templates/kiosk.html")
+	if err != nil {
+		log.Fatalf("Failed to parse kiosk templates: %v", err)
+	}
+
 	slidesTmpl, err := template.ParseFiles("web/templates/slides.html")
 	if err != nil {
 		log.Fatalf("Failed to parse slides template: %v", err)
@@ -96,6 +110,97 @@ func main() {
 			return cookie.Value
 		}
 		return "de"
+	}
+
+	// Helper to fetch kiosk page data
+	fetchKioskData := func(lang string, activeEmpID int64) (*KioskPageData, error) {
+		// Fetch employees
+		empRows, err := database.Query("SELECT id, name, role, hourly_rate, cost_rate, billing_rate, created_at FROM employees ORDER BY name ASC")
+		if err != nil {
+			return nil, err
+		}
+		defer empRows.Close()
+
+		var employees []models.Employee
+		for empRows.Next() {
+			var emp models.Employee
+			if err := empRows.Scan(&emp.ID, &emp.Name, &emp.Role, &emp.HourlyRate, &emp.CostRate, &emp.BillingRate, &emp.CreatedAt); err != nil {
+				return nil, err
+			}
+			employees = append(employees, emp)
+		}
+
+		if activeEmpID <= 0 && len(employees) > 0 {
+			activeEmpID = employees[0].ID
+		}
+
+		// Fetch active timer session for active employee
+		activeSessionMap := make(map[int64]models.ActiveTimerSession)
+		sessionRows, err := database.Query("SELECT id, employee_id, campaign_id, task_category, started_at FROM active_timer_sessions WHERE employee_id = ?", activeEmpID)
+		if err == nil {
+			defer sessionRows.Close()
+			for sessionRows.Next() {
+				var sess models.ActiveTimerSession
+				if err := sessionRows.Scan(&sess.ID, &sess.EmployeeID, &sess.CampaignID, &sess.TaskCategory, &sess.StartedAt); err == nil {
+					activeSessionMap[sess.CampaignID] = sess
+				}
+			}
+		}
+
+		// Fetch budget summaries for campaigns
+		summaryRows, err := database.Query(`
+			SELECT 
+				c.id, cl.name, c.name, c.target_budget,
+				COALESCE(SUM(tl.hours * COALESCE(NULLIF(e.billing_rate, 0), e.hourly_rate)), 0) AS actual_spend,
+				COALESCE(SUM(tl.hours), 0) AS hours_logged
+			FROM campaigns c
+			JOIN clients cl ON c.client_id = cl.id
+			LEFT JOIN time_logs tl ON c.id = tl.campaign_id
+			LEFT JOIN employees e ON tl.employee_id = e.id
+			GROUP BY c.id, cl.name, c.name, c.target_budget
+			ORDER BY cl.name ASC, c.name ASC
+		`)
+		if err != nil {
+			return nil, err
+		}
+		defer summaryRows.Close()
+
+		var cards []models.KioskCard
+		for summaryRows.Next() {
+			var card models.KioskCard
+			if err := summaryRows.Scan(&card.CampaignID, &card.ClientName, &card.CampaignName, &card.TargetBudget, &card.ActualSpend, &card.HoursLogged); err != nil {
+				return nil, err
+			}
+			if card.TargetBudget > 0 {
+				card.UsagePercent = (card.ActualSpend / card.TargetBudget) * 100.0
+			}
+			if card.UsagePercent > 100.0 {
+				card.Status = "danger"
+			} else if card.UsagePercent >= 80.0 {
+				card.Status = "warning"
+			} else {
+				card.Status = "ok"
+			}
+
+			if sess, exists := activeSessionMap[card.CampaignID]; exists {
+				card.IsActive = true
+				card.ActiveEmpID = activeEmpID
+				card.StartedAtUnix = sess.StartedAt.Unix()
+				card.TaskCategory = sess.TaskCategory
+			} else {
+				card.TaskCategory = "Content & Editing"
+			}
+
+			cards = append(cards, card)
+		}
+
+		return &KioskPageData{
+			Version:     version,
+			Lang:        lang,
+			ActiveEmpID: activeEmpID,
+			Employees:   employees,
+			Cards:       cards,
+		}, nil
 	}
 
 	// Helper to fetch page data
@@ -397,6 +502,147 @@ func main() {
 		w.Header().Set("Cache-Control", "no-cache")
 		w.WriteHeader(http.StatusOK)
 		w.Write(audioBytes)
+	})
+
+	// Route: GET /tracker (800x480 Hardware Kiosk Touch Quick-Tracker)
+	http.HandleFunc("/tracker", func(w http.ResponseWriter, r *http.Request) {
+		lang := getLang(r)
+		empID, _ := strconv.ParseInt(r.FormValue("employee_id"), 10, 64)
+
+		data, err := fetchKioskData(lang, empID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			if err := kioskTmpl.ExecuteTemplate(w, "kiosk_cards", data); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+			return
+		}
+
+		if err := kioskTmpl.ExecuteTemplate(w, "kiosk.html", data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
+
+	// Helper for stopping active timer and logging 15-min billing rounded time
+	stopActiveTimerSession := func(empID int64) error {
+		var sessionID, campID int64
+		var category string
+		var startedAt time.Time
+
+		err := database.QueryRow(
+			"SELECT id, campaign_id, task_category, started_at FROM active_timer_sessions WHERE employee_id = ?",
+			empID,
+		).Scan(&sessionID, &campID, &category, &startedAt)
+
+		if err == nil && sessionID > 0 {
+			durationMinutes := time.Since(startedAt).Minutes()
+			// 15-minute agency billing interval rounding (min 0.25h)
+			roundedHours := math.Max(0.25, math.Ceil(durationMinutes/15.0)*0.25)
+			description := category + " (Kiosk Quick-Track)"
+
+			tx, err := database.Begin()
+			if err != nil {
+				return err
+			}
+			defer tx.Rollback()
+
+			if _, err := tx.Exec(
+				"INSERT INTO time_logs (campaign_id, employee_id, hours, description, logged_at) VALUES (?, ?, ?, ?, ?)",
+				campID, empID, roundedHours, description, time.Now(),
+			); err != nil {
+				return err
+			}
+
+			if _, err := tx.Exec("DELETE FROM active_timer_sessions WHERE id = ?", sessionID); err != nil {
+				return err
+			}
+
+			return tx.Commit()
+		}
+		return nil
+	}
+
+	// Route: POST /api/kiosk/start
+	http.HandleFunc("/api/kiosk/start", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		empID, _ := strconv.ParseInt(r.FormValue("employee_id"), 10, 64)
+		campID, _ := strconv.ParseInt(r.FormValue("campaign_id"), 10, 64)
+		category := r.FormValue("task_category")
+		if category == "" {
+			category = "Content & Editing"
+		}
+
+		if empID > 0 && campID > 0 {
+			// Auto-stop any existing active timer for this employee
+			_ = stopActiveTimerSession(empID)
+
+			// Start new active timer session
+			_, err := database.Exec(
+				"INSERT INTO active_timer_sessions (employee_id, campaign_id, task_category, started_at) VALUES (?, ?, ?, ?)",
+				empID, campID, category, time.Now(),
+			)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+
+		lang := getLang(r)
+		data, err := fetchKioskData(lang, empID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			if err := kioskTmpl.ExecuteTemplate(w, "kiosk_cards", data); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+			return
+		}
+
+		http.Redirect(w, r, "/tracker?employee_id="+strconv.FormatInt(empID, 10), http.StatusSeeOther)
+	})
+
+	// Route: POST /api/kiosk/stop
+	http.HandleFunc("/api/kiosk/stop", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		empID, _ := strconv.ParseInt(r.FormValue("employee_id"), 10, 64)
+
+		if empID > 0 {
+			if err := stopActiveTimerSession(empID); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+
+		lang := getLang(r)
+		data, err := fetchKioskData(lang, empID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			if err := kioskTmpl.ExecuteTemplate(w, "kiosk_cards", data); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+			return
+		}
+
+		http.Redirect(w, r, "/tracker?employee_id="+strconv.FormatInt(empID, 10), http.StatusSeeOther)
 	})
 
 	// Route: POST /api/time-logs

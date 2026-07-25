@@ -70,6 +70,16 @@ func (db *DB) createTables() error {
 		FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
 		FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
 	);
+
+	CREATE TABLE IF NOT EXISTS active_timer_sessions (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		employee_id INTEGER NOT NULL UNIQUE,
+		campaign_id INTEGER NOT NULL,
+		task_category TEXT NOT NULL DEFAULT 'Content & Editing',
+		started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE,
+		FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE
+	);
 	`
 	if _, err := db.Exec(schema); err != nil {
 		return err
@@ -102,7 +112,7 @@ func (db *DB) ResetToSeedData() error {
 	defer tx.Rollback()
 
 	// Clear existing tables
-	if _, err := tx.Exec("DELETE FROM time_logs; DELETE FROM campaigns; DELETE FROM clients; DELETE FROM employees;"); err != nil {
+	if _, err := tx.Exec("DELETE FROM active_timer_sessions; DELETE FROM time_logs; DELETE FROM campaigns; DELETE FROM clients; DELETE FROM employees;"); err != nil {
 		return err
 	}
 

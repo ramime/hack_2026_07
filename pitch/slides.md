@@ -61,6 +61,12 @@ Time tracking plus a Team Lead cockpit that surfaces budget drift before it hits
 - Client profitability & employee efficiency breakdowns
 - Integrated ElevenLabs Voice Briefing for instant audio executive updates
 
+# Hardware Kiosk (800×480)
+
+- Dedicated `/tracker` view optimized for 7" Raspberry Pi touchscreens & mobile
+- Live digital stopwatch (`00:14:52`) & glowing green neon pulse animation
+- Single-tap Start/Stop with 15-min agency billing rounding & audio chime
+
 ---
 
 # Demo Reset
@@ -72,6 +78,6 @@ Time tracking plus a Team Lead cockpit that surfaces budget drift before it hits
 
 # What's Next
 
-- 800×480 kiosk tracker
 - Client portal + security automation
+
 

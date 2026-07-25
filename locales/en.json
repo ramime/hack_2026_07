@@ -68,6 +68,17 @@
   "th_billing_rate": "Billing Rate (€/h)",
   "audio_briefing_title": "🔊 ElevenLabs Voice Briefing",
   "audio_briefing_desc": "Generates a 15-second audio executive summary of the current financial status.",
-  "play_audio_briefing": "🔊 Play Audio Briefing"
+  "play_audio_briefing": "🔊 Play Audio Briefing",
+  "kiosk_title": "800x480 Hardware Touch Quick-Tracker",
+  "kiosk_subtitle": "Lightning fast time tracking for Raspberry Pi Touchscreens",
+  "active_timer": "Active Timer",
+  "btn_start_timer": "▶ START",
+  "btn_stop_timer": "⏹ STOP & LOG",
+  "back_to_dashboard": "← Dashboard",
+  "select_active_employee": "Select Employee",
+  "preset_video": "🎬 Video Cut",
+  "preset_design": "🎨 Design & Assets",
+  "preset_concept": "💡 Concept",
+  "preset_meeting": "📞 Meeting"
 }
 

@@ -35,8 +35,11 @@
 
 ---
 
-## ⏳ v0.4.0 — Hardware Kiosk (800x480)
-- [ ] Touch-optimized `/tracker` view with stopwatch cards and Start/Stop buttons.
+## 🟢 v0.4.0 — Hardware Kiosk (800x480) (COMPLETED)
+- [x] Touch-optimized `/tracker` view with favorite campaign cards and Start/Stop buttons.
+- [x] Live digital stopwatch counter (`00:14:52`) & glowing green neon pulse animation.
+- [x] Auto-stop timer session management with 15-minute agency billing rounding into SQLite `time_logs`.
+- [x] Web Audio API chime sound & activity preset touch pills.
 
 ---
 

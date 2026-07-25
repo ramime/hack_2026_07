@@ -83,4 +83,28 @@ type EmployeeEfficiency struct {
 	MarginPercent   float64 `json:"margin_percent"`
 }
 
+type ActiveTimerSession struct {
+	ID           int64     `json:"id"`
+	EmployeeID   int64     `json:"employee_id"`
+	CampaignID   int64     `json:"campaign_id"`
+	TaskCategory string    `json:"task_category"`
+	StartedAt    time.Time `json:"started_at"`
+}
+
+type KioskCard struct {
+	CampaignID    int64     `json:"campaign_id"`
+	ClientName    string    `json:"client_name"`
+	CampaignName  string    `json:"campaign_name"`
+	TargetBudget  float64   `json:"target_budget"`
+	ActualSpend   float64   `json:"actual_spend"`
+	HoursLogged   float64   `json:"hours_logged"`
+	UsagePercent  float64   `json:"usage_percent"`
+	Status        string    `json:"status"` // ok, warning, danger
+	IsActive      bool      `json:"is_active"`
+	ActiveEmpID   int64     `json:"active_emp_id"`
+	StartedAtUnix int64     `json:"started_at_unix"`
+	TaskCategory  string    `json:"task_category"`
+}
+
+
 
