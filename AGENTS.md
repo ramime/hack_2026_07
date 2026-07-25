@@ -30,4 +30,5 @@ Guidelines for AI Coding Assistants working on AgencyPulse.
 
 - SemVer tags: `v0.0.1` (Bootstrap), `v0.1.0` (Foundation & Time Tracking), `v0.2.0` (Team Lead & Alerts), `v0.3.0` (Executive View), `v0.4.0` (800x480 Kiosk), `v0.5.0` (Client Portal), `v0.6.0` (Fraud & n8n), `v1.0.0` (Pitch Release).
 - Patch tags `v0.X.1` reserved strictly for bug fixes.
+- **Development Versioning (-beta.x)**: During active development phases, the version variable in code (e.g. `cmd/agencypulse/main.go`) **MUST always include a `-beta.x` suffix** (e.g., `0.1.0-beta.1`, `0.1.0-beta.2`). The `-beta.x` suffix is removed only when the version is officially tagged and deployed.
 - Every release MUST leave a fully runnable application tested locally before tagging.

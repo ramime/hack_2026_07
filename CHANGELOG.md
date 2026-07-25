@@ -4,6 +4,16 @@ All notable changes to AgencyPulse will be documented in this file.
 
 ---
 
+## [v0.1.0] — 2026-07-25 (Foundation & Time Tracking Release)
+### Added
+- Integrated pure Go SQLite database (`modernc.org/sqlite`) with automatic migrations.
+- Pitch storytelling seed data (Ritter Sport, Bosch, Porsche) with initial campaign time logs.
+- Bilingual i18n support (`locales/de.json` & `locales/en.json`) with header language toggle (`DE`/`EN`).
+- Dark Mode Glassmorphic Design System (`web/static/styles.css`).
+- HTMX employee view for reactive time tracking entry and recent log list.
+- 1-click Demo Reset endpoint (`POST /api/reset-demo-data`).
+- Unit test suite for database and i18n modules.
+
 ## [v0.0.1] — 2026-07-24 (Bootstrap Release)
 ### Added
 - Minimal Go HTTP webserver returning `"Hello World!"` with HTTP 200 OK.

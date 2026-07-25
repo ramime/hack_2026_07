@@ -10,13 +10,13 @@
 
 ---
 
-## ⏳ v0.1.0 — Foundation & Time Tracking
-- [ ] SQLite database setup (`modernc.org/sqlite`).
-- [ ] Pitch storytelling seed data (Ritter Sport = Green, Bosch = Yellow, Porsche = Red).
-- [ ] i18n middleware and dictionary loader (`locales/de.json` & `locales/en.json`).
-- [ ] Dark mode UI shell & header with Role Switcher & Language Toggle.
-- [ ] Employee view with HTMX time tracking form.
-- [ ] 1-click Demo Reset endpoint (`POST /api/reset-demo-data`).
+## 🟢 v0.1.0 — Foundation & Time Tracking (COMPLETED)
+- [x] SQLite database setup (`modernc.org/sqlite`).
+- [x] Pitch storytelling seed data (Ritter Sport = Green, Bosch = Yellow, Porsche = Red).
+- [x] i18n middleware and dictionary loader (`locales/de.json` & `locales/en.json`).
+- [x] Dark mode UI shell & header with Role Switcher & Language Toggle.
+- [x] Employee view with HTMX time tracking form.
+- [x] 1-click Demo Reset endpoint (`POST /api/reset-demo-data`).
 
 ---
 

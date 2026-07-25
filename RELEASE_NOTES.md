@@ -1,16 +1,18 @@
-# RELEASE_NOTES.md — AgencyPulse v0.0.1
+# RELEASE_NOTES.md — AgencyPulse v0.1.0
 
-**Release Date:** 2026-07-24  
-**Milestone:** Initial Bootstrap Release (`v0.0.1`)
+**Release Date:** 2026-07-25  
+**Milestone:** Foundation & Time Tracking (`v0.1.0`)
 
 ---
 
 ## 🎯 Release Summary
 
-This initial bootstrap release verifies local Go compilation, VS Code task execution, deployment scripts for Linux VPS, and automated squashed release publishing to public GitHub.
+The `v0.1.0` release establishes the database foundation, multi-language support (i18n), pitch storytelling seed data, glassmorphic dark mode styling, and HTMX reactive time tracking.
 
-### Included in v0.0.1:
-- Minimal Go HTTP webserver listening on `:8080` returning `"Hello World!"`.
-- VPS Deployment scripts: `deploy-vps.sh` and `deploy-vps.ps1`.
-- Public GitHub release scripts: `publish-github.sh` and `publish-github.ps1`.
-- `.vscode/tasks.json` configured for `Ctrl+Shift+B`.
+### Key Highlights in v0.1.0:
+- **Pure Go SQLite Integration**: `modernc.org/sqlite` database layer with schema migrations and seed data initialization.
+- **Pitch Storytelling Seed Data**: Pre-loaded clients and campaigns (Ritter Sport = Green, Bosch = Yellow, Porsche = Red) with historical time logs.
+- **Dark Mode Glassmorphic UI**: High-contrast, sleek design system (`web/static/styles.css`) using custom CSS tokens.
+- **Reactive HTMX Time Entry**: Form for logging hours per employee & campaign with dynamic table updates without page reloads.
+- **Language Switcher (i18n)**: Seamless German (`DE`) & English (`EN`) UI translation toggling.
+- **1-Click Demo Reset**: Endpoint (`POST /api/reset-demo-data`) to instantly restore seed state during live pitch presentations.

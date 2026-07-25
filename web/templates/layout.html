@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="{{ .Lang }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ t .Lang "app_title" }} — {{ t .Lang "app_subtitle" }}</title>
+  <meta name="description" content="AgencyPulse real-time agency profitability and time tracking tool.">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+</head>
+<body>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('agencypulse_theme') || 'dark';
+      document.body.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+
+  <header class="header">
+    <a href="/" class="brand">
+      <div class="brand-icon">A</div>
+      <div class="brand-text">AgencyPulse</div>
+      <span class="brand-subtitle">{{ t .Lang "role_employee" }}</span>
+    </a>
+
+    <div class="header-controls">
+      <button id="theme-toggle-btn" type="button" class="theme-toggle" onclick="toggleTheme()" title="Theme Switcher">
+        <span id="theme-toggle-icon">🌙</span> <span id="theme-toggle-text">Dark</span>
+      </button>
+
+      <form hx-post="/api/set-language">
+        <input type="hidden" name="lang" value="{{ if eq .Lang "de" }}en{{ else }}de{{ end }}">
+        <button type="submit" class="lang-toggle">
+          🌐 {{ if eq .Lang "de" }}EN{{ else }}DE{{ end }}
+        </button>
+      </form>
+    </div>
+  </header>
+
+  <main class="main-container" id="main-content">
+    {{ template "content" . }}
+  </main>
+
+  <footer class="footer">
+    <div class="footer-left">
+      <span>AgencyPulse &copy; 2026 Social Media Hackathon</span>
+      <form hx-post="/api/reset-demo-data" hx-target="#main-content" hx-swap="innerHTML" style="display: inline-block;">
+        <button type="submit" class="btn-subtle" title="{{ t .Lang "reset_demo" }}">
+          ⚡ {{ t .Lang "reset_demo" }}
+        </button>
+      </form>
+    </div>
+    <span class="footer-version">v{{ .Version }}</span>
+  </footer>
+
+  <script>
+    function updateThemeUI(theme) {
+      const icon = document.getElementById('theme-toggle-icon');
+      const text = document.getElementById('theme-toggle-text');
+      if (theme === 'light') {
+        icon.textContent = '☀️';
+        text.textContent = 'Light';
+      } else {
+        icon.textContent = '🌙';
+        text.textContent = 'Dark';
+      }
+    }
+
+    function toggleTheme() {
+      const current = document.body.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', next);
+      localStorage.setItem('agencypulse_theme', next);
+      updateThemeUI(next);
+    }
+
+    // Initial Sync
+    document.addEventListener("DOMContentLoaded", function() {
+      const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+      updateThemeUI(currentTheme);
+    });
+  </script>
+</body>
+</html>
