@@ -172,22 +172,8 @@ func writeJSON(path string, v any) error {
 
 func runCapture(base, runConfig, outDir, videoName string) error {
 	toolDir := "tools/screencast"
-	if _, err := os.Stat(filepath.Join(toolDir, "node_modules", "playwright")); err != nil {
-		fmt.Println("Installing Playwright dependencies (first run)...")
-		install := exec.Command("npm", "install")
-		install.Dir = toolDir
-		install.Stdout = os.Stdout
-		install.Stderr = os.Stderr
-		if err := install.Run(); err != nil {
-			return fmt.Errorf("npm install: %w", err)
-		}
-		browsers := exec.Command("npx", "playwright", "install", "chromium")
-		browsers.Dir = toolDir
-		browsers.Stdout = os.Stdout
-		browsers.Stderr = os.Stderr
-		if err := browsers.Run(); err != nil {
-			return fmt.Errorf("playwright install chromium: %w", err)
-		}
+	if err := ensurePlaywright(toolDir); err != nil {
+		return err
 	}
 
 	absConfig, err := filepath.Abs(runConfig)
@@ -210,6 +196,47 @@ func runCapture(base, runConfig, outDir, videoName string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
+}
+
+func ensurePlaywright(toolDir string) error {
+	pwMod := filepath.Join(toolDir, "node_modules", "playwright")
+	if _, err := os.Stat(pwMod); err != nil {
+		fmt.Println("Installing Playwright npm package...")
+		install := exec.Command("npm", "install")
+		install.Dir = toolDir
+		install.Stdout = os.Stdout
+		install.Stderr = os.Stderr
+		if err := install.Run(); err != nil {
+			return fmt.Errorf("npm install: %w", err)
+		}
+	}
+
+	// Always ensure the browser revision for this Playwright version exists
+	// in the default user cache (~/.cache/ms-playwright). Harmless if already present.
+	fmt.Println("Ensuring Playwright Chromium browser is installed...")
+	browsers := exec.Command("npx", "playwright", "install", "chromium")
+	browsers.Dir = toolDir
+	browsers.Stdout = os.Stdout
+	browsers.Stderr = os.Stderr
+	// Do not inherit a custom PLAYWRIGHT_BROWSERS_PATH from agent/CI sandboxes
+	// when the user runs locally — strip it so browsers land in the default cache.
+	browsers.Env = filterEnv(os.Environ(), "PLAYWRIGHT_BROWSERS_PATH")
+	if err := browsers.Run(); err != nil {
+		return fmt.Errorf("playwright install chromium: %w\nTry manually: cd tools/screencast && npx playwright install chromium", err)
+	}
+	return nil
+}
+
+func filterEnv(env []string, dropKey string) []string {
+	prefix := dropKey + "="
+	out := make([]string, 0, len(env))
+	for _, e := range env {
+		if strings.HasPrefix(e, prefix) {
+			continue
+		}
+		out = append(out, e)
+	}
+	return out
 }
 
 func muxVideo(rawWebm string, audioFiles []string, outMP4 string, maxSeconds int) error {

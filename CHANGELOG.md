@@ -2,6 +2,10 @@
 
 All notable changes to AgencyPulse will be documented in this file.
 
+## [v0.1.4] — 2026-07-25 (Pitch Media & UI Asset Patch)
+### Added
+- Maintenance and pitch media pipeline alignment release.
+
 ## [v0.1.3] — 2026-07-25 (Pitch Deck Deployment Patch)
 ### Added
 - Deployment script support (`deploy-vps.sh` and `deploy-vps.ps1`) for copying `pitch/` directory assets to VPS (`/opt/agencypulse/pitch`).

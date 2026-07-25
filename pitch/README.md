@@ -17,7 +17,12 @@ Release slideshow + screencast pipeline for AgencyPulse.
 
 ## Runbook (learn the flow)
 
-Prerequisites: Go, Node/npm, ffmpeg, Chromium via Playwright (installed on first `pitchmedia` run).
+Prerequisites: Go, Node/npm, ffmpeg. Playwright Chromium is installed automatically on
+`pitchmedia` run into `~/.cache/ms-playwright`. Manual fallback:
+
+```bash
+cd tools/screencast && npx playwright install chromium
+```
 
 ### 1. Start the app
 
