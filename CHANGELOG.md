@@ -2,6 +2,11 @@
 
 All notable changes to AgencyPulse will be documented in this file.
 
+## [v0.7.2] — 2026-07-25 (Full Origin Portal URL Resolution Patch Release)
+### Fixed
+- Portal Link input fields in `/masterdata?tab=portal` now automatically populate with complete, full origin URLs (e.g. `http://localhost:8084/portal/c/<token>` or `https://<domain>/portal/c/<token>`).
+- Direct copying from input fields or clicking the copy button yields a fully clickable absolute URL.
+
 ## [v0.7.1] — 2026-07-25 (Table Currency Column Width Patch Release)
 ### Fixed
 - Added global `white-space: nowrap;` table styles in `web/static/styles.css` preventing currency amounts (`57.400,00 €`) and table headers from wrapping onto multiple lines.

@@ -59,8 +59,8 @@
         <div style="margin-bottom: 1rem;">
           <label style="display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">{{ t $.Lang "th_portal_link" }}:</label>
           <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <input type="text" readonly value="/portal/c/{{ .PortalToken }}" id="portal-url-{{ .ID }}" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #e2e8f0; padding: 0.4rem 0.6rem; border-radius: 6px; font-family: monospace; font-size: 0.85rem;" />
-            <button type="button" onclick="navigator.clipboard.writeText(window.location.origin + '/portal/c/{{ .PortalToken }}'); alert('Link copied to clipboard!');" class="btn-subtle" style="padding: 0.4rem 0.75rem; white-space: nowrap;">
+            <input type="text" readonly value="/portal/c/{{ .PortalToken }}" id="portal-url-{{ .ID }}" class="portal-url-input" data-token="{{ .PortalToken }}" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #e2e8f0; padding: 0.4rem 0.6rem; border-radius: 6px; font-family: monospace; font-size: 0.85rem;" />
+            <button type="button" onclick="const val = document.getElementById('portal-url-{{ .ID }}').value; navigator.clipboard.writeText(val.startsWith('http') ? val : window.location.origin + val); alert('Full Client Portal Link copied to clipboard!');" class="btn-subtle" style="padding: 0.4rem 0.75rem; white-space: nowrap;">
               📋 {{ t $.Lang "btn_copy_link" }}
             </button>
           </div>
@@ -71,6 +71,7 @@
         <a href="/portal/c/{{ .PortalToken }}" target="_blank" class="btn-subtle" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem;">
           🚀 Open Portal ↗
         </a>
+
 
         <!-- Quick PIN update form -->
         <form hx-post="/api/masterdata/client/save" hx-target="#main-content" hx-swap="innerHTML" style="display: flex; align-items: center; gap: 0.4rem;">
@@ -328,4 +329,19 @@
   </div>
 </div>
 {{ end }}
+
+<script>
+  (function() {
+    function expandPortalURLs() {
+      document.querySelectorAll('.portal-url-input').forEach(input => {
+        const token = input.getAttribute('data-token');
+        if (token && !input.value.startsWith('http')) {
+          input.value = window.location.origin + '/portal/c/' + token;
+        }
+      });
+    }
+    expandPortalURLs();
+    document.body.addEventListener('htmx:afterSwap', expandPortalURLs);
+  })();
+</script>
 {{ end }}
