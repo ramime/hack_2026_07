@@ -12,9 +12,10 @@ import (
 	"agencypulse/internal/db"
 	"agencypulse/internal/i18n"
 	"agencypulse/internal/models"
+	"agencypulse/internal/pitch"
 )
 
-const version = "0.1.1"
+const version = "0.1.2"
 
 type PageData struct {
 	Version    string
@@ -54,6 +55,11 @@ func main() {
 	}).ParseFiles("web/templates/layout.html", "web/templates/employee.html")
 	if err != nil {
 		log.Fatalf("Failed to parse templates: %v", err)
+	}
+
+	slidesTmpl, err := template.ParseFiles("web/templates/slides.html")
+	if err != nil {
+		log.Fatalf("Failed to parse slides template: %v", err)
 	}
 
 	// Static file handler
@@ -140,6 +146,22 @@ func main() {
 			SuccessMsg: successMsg,
 		}, nil
 	}
+
+	// Route: GET /slides (pitch deck — content from pitch/slides.md)
+	http.HandleFunc("/slides", func(w http.ResponseWriter, r *http.Request) {
+		slides, err := pitch.LoadSlides("pitch/slides.md")
+		if err != nil {
+			http.Error(w, "slides unavailable: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		data := struct {
+			Version string
+			Slides  []pitch.Slide
+		}{Version: version, Slides: slides}
+		if err := slidesTmpl.ExecuteTemplate(w, "slides.html", data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
 
 	// Route: GET /
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

@@ -1,15 +1,14 @@
-# RELEASE_NOTES.md — AgencyPulse v0.1.1
+# RELEASE_NOTES.md — AgencyPulse v0.1.2
 
 **Release Date:** 2026-07-25  
-**Milestone:** Pitch Media Boundary Patch (`v0.1.1`)
+**Milestone:** Slides Navigation Link Patch (`v0.1.2`)
 
 ---
 
 ## 🎯 Release Summary
 
-The `v0.1.1` release introduces stable UI testing selectors (`data-testid`), an automated health check API endpoint (`GET /api/health`), and formal alignment with the Pitch Media pipeline boundary.
+The `v0.1.2` patch release adds a subtle `/slides` navigation link to the application footer bar with Playwright selector support (`data-testid="slides-link"`).
 
-### Key Highlights in v0.1.1:
-- **Health Check API**: `GET /api/health` returning JSON `{"ok": true, "version": "0.1.1"}` for automated orchestration.
-- **Stable UI Selectors**: Added `data-testid` attributes to all forms, inputs, buttons, and tables to support Playwright automated screencast recording.
-- **Pitch Contract Alignment**: Fully aligned `pitch/manifest.yaml` with shipped application routes and entrypoints.
+### Key Highlights in v0.1.2:
+- **Slides Footer Link**: Added `📊 Slides` link in footer for one-click access to the in-app pitch slideshow.
+- **i18n Localization**: Localized navigation label across German and English dictionaries.

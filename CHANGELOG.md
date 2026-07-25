@@ -2,6 +2,11 @@
 
 All notable changes to AgencyPulse will be documented in this file.
 
+## [v0.1.2] — 2026-07-25 (Slides Footer Link Patch)
+### Added
+- Subtle `/slides` navigation link in application footer (`layout.html`) with `data-testid="slides-link"`.
+- i18n keys for slides navigation (`locales/de.json` & `locales/en.json`).
+
 ## [v0.1.1] — 2026-07-25 (Pitch Media Boundary & Health API Patch)
 ### Added
 - Health check HTTP endpoint (`GET /api/health`) returning JSON status and SemVer version.

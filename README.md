@@ -44,6 +44,16 @@ go build -o build/agencypulse ./cmd/agencypulse
 ### VS Code
 Press `Ctrl+Shift+B` to compile and run the local server.
 
+### Pitch slides & screencast
+```bash
+# With the app running on :8084
+open http://localhost:8084/slides
+
+# Silent screencast with burned-in captions (default -tts skip)
+go run ./cmd/pitchmedia
+```
+See [pitch/README.md](pitch/README.md) for the full runbook and [pitch/DEV_AGENT_CONTRACT.md](pitch/DEV_AGENT_CONTRACT.md) for Dev-Agent boundaries.
+
 ---
 
 ## 📜 Documentation
@@ -54,3 +64,4 @@ Press `Ctrl+Shift+B` to compile and run the local server.
 - [DESIGN.md](DESIGN.md) — UI design tokens & 800x480 Kiosk specs.
 - [DECISIONS.md](DECISIONS.md) — Architectural decision records (ADRs).
 - [DEPLOYMENT.md](DEPLOYMENT.md) — VPS deployment instructions.
+- [pitch/README.md](pitch/README.md) — Pitch slides & release screencast pipeline.

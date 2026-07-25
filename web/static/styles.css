@@ -171,6 +171,26 @@ body {
   background: var(--bg-card-hover);
 }
 
+.link-subtle {
+  color: var(--text-muted);
+  text-decoration: none;
+  border: 1px dashed var(--border-color);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.link-subtle:hover {
+  color: var(--text-main);
+  border-color: var(--accent-primary);
+  background: var(--bg-card-hover);
+}
+
 .main-container {
   max-width: 1200px;
   width: 100%;

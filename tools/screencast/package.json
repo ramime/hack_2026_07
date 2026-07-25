@@ -1,0 +1,12 @@
+{
+  "name": "agencypulse-screencast",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "capture": "node capture.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.54.0"
+  }
+}

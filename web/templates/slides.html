@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgencyPulse — Pitch Slides</title>
+  <link rel="stylesheet" href="/static/slides.css">
+</head>
+<body class="slides-body">
+  <div class="slides-deck" id="deck" tabindex="0">
+    {{ range $i, $s := .Slides }}
+    <section class="slide{{ if eq $i 0 }} is-active{{ end }}" data-index="{{ $i }}">
+      <div class="slide-inner">
+        {{ if $s.Title }}<h1 class="slide-title">{{ $s.Title }}</h1>{{ end }}
+        <div class="slide-body">{{ $s.HTML }}</div>
+      </div>
+    </section>
+    {{ end }}
+  </div>
+
+  <footer class="slides-chrome">
+    <a class="slides-home" href="/">← App</a>
+    <div class="slides-progress">
+      <span id="slide-pos">1</span> / <span id="slide-total">{{ len .Slides }}</span>
+      <span class="slides-version">v{{ .Version }}</span>
+    </div>
+    <div class="slides-hint">← → Space · Esc</div>
+  </footer>
+
+  <script>
+    (function () {
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const posEl = document.getElementById('slide-pos');
+      let idx = 0;
+
+      function show(i) {
+        if (!slides.length) return;
+        idx = Math.max(0, Math.min(slides.length - 1, i));
+        slides.forEach((el, n) => el.classList.toggle('is-active', n === idx));
+        posEl.textContent = String(idx + 1);
+        history.replaceState(null, '', '#s' + (idx + 1));
+      }
+
+      function fromHash() {
+        const m = location.hash.match(/^#s(\d+)$/);
+        if (m) show(parseInt(m[1], 10) - 1);
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+          e.preventDefault();
+          show(idx + 1);
+        } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+          e.preventDefault();
+          show(idx - 1);
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          show(0);
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          show(slides.length - 1);
+        } else if (e.key === 'Escape') {
+          window.location.href = '/';
+        }
+      });
+
+      let touchX = null;
+      document.addEventListener('touchstart', (e) => {
+        touchX = e.changedTouches[0].screenX;
+      }, { passive: true });
+      document.addEventListener('touchend', (e) => {
+        if (touchX === null) return;
+        const dx = e.changedTouches[0].screenX - touchX;
+        if (Math.abs(dx) > 40) show(idx + (dx < 0 ? 1 : -1));
+        touchX = null;
+      }, { passive: true });
+
+      document.getElementById('deck').addEventListener('click', (e) => {
+        if (e.target.closest('a')) return;
+        const mid = window.innerWidth / 2;
+        show(idx + (e.clientX >= mid ? 1 : -1));
+      });
+
+      window.addEventListener('hashchange', fromHash);
+      fromHash();
+      document.getElementById('deck').focus();
+    })();
+  </script>
+</body>
+</html>
