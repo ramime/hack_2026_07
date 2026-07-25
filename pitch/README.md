@@ -1,7 +1,8 @@
 # Pitch Media
 
-**Current pitch target:** `v0.7.0-beta` — Master Data & Client PIN overview  
-**Primary demo base:** `http://localhost:8084`
+**Current pitch target:** `v0.7.4` — Slides branding + Master Data & Client PIN overview  
+**Primary demo base:** `http://localhost:8084`  
+**Live demo:** `https://trw5wo98w.ralf-metzing.de`
 
 ## Slides
 
@@ -17,7 +18,7 @@ Captions use a solid black plate for readability.
 
 ```bash
 go run ./cmd/pitchmedia
-# → artifacts/agencypulse-0.7.0-beta.1.mp4
+# → artifacts/agencypulse-0.7.4.mp4
 ```
 
 ## Key demo URLs

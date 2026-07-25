@@ -1,6 +1,6 @@
 <!--
   OWNER: Pitch Media pipeline ONLY
-  Target: v0.7.0-beta — Master Data + prior domain story
+  Target: v0.7.4 — Branding + Master Data + prior domain story
 -->
 
 ![AgencyPulse](/static/logo.svg)

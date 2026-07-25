@@ -16,7 +16,8 @@
 ---
 
 ### Project Logo (Recommended)
-- **Status:** *TBD* (Square PNG, JPEG, WebP, or SVG up to 2 MB)
+- **Asset:** `web/static/logo-icon.svg` (and `web/static/logo.svg`)
+- **Status:** Complete (Vector SVG App Logo & Favicon)
 
 ---
 

@@ -1,8 +1,8 @@
 # OWNER: Pitch Media pipeline ONLY
-# Screencast for v0.7.0-beta — master data + domain story
+# Screencast for v0.7.4 — slides branding + master data domain story
 # Captions: solid black plate for readability
 
-version: "0.7.0-beta.1"
+version: "0.7.5"
 lang: en
 viewport:
   width: 1280

@@ -2,6 +2,11 @@
 
 All notable changes to AgencyPulse will be documented in this file.
 
+## [v0.7.5] — 2026-07-25 (Pitch Media Assets & Submission Release)
+### Added
+- Updated pitch screencast scenes, slide deck assets, and submission manifest documentation.
+- Integrated logo assets into `SUBMISSION.md`.
+
 ## [v0.7.4] — 2026-07-25 (Pitch Slides SVG Branding & Chromes Release)
 ### Added
 - Integrated SVG Vector Brand Logos (`/static/logo.svg` & `/static/logo-icon.svg`) directly into `/slides` presentation deck.
