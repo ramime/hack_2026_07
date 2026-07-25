@@ -68,6 +68,10 @@ async function runStep(page, step, scene) {
     return;
   }
   if (action === "wait") {
+    if (step.testid) {
+      const sel = `[data-testid="${step.testid}"]`;
+      await page.locator(sel).first().waitFor({ state: "visible", timeout: 10000 });
+    }
     await page.waitForTimeout(step.ms || 1000);
     return;
   }

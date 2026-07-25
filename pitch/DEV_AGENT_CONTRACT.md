@@ -85,12 +85,17 @@ updating `manifest.yaml` → `demo.entrypoints`.
 | `theme-toggle` | Theme switch control |
 | `reset-demo-button` | Demo reset control in footer |
 
-### Add when those features ship
+### Required for v0.2 Team Lead Cockpit (`/teamlead`)
+
+| `data-testid` | Element |
+|---------------|---------|
+| `budget-heatmap` | Heatmap card grid wrapper |
+| `ai-estimator-open` | AI Time & Budget Estimator open button |
+
+### Add when later features ship
 
 | `data-testid` | Feature |
 |---------------|---------|
-| `budget-heatmap` | Team-lead budget heatmap |
-| `ai-estimator-open` | AI Time & Budget Estimator trigger |
 | `executive-kpis` | Executive profitability view |
 | `audio-briefing-button` | ElevenLabs in-app briefing |
 | `kiosk-start-stop` | `/tracker` kiosk controls |

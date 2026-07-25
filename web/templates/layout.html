@@ -17,11 +17,17 @@
   </script>
 
   <header class="header">
-    <a href="/" class="brand">
-      <div class="brand-icon">A</div>
-      <div class="brand-text">AgencyPulse</div>
-      <span class="brand-subtitle">{{ t .Lang "role_employee" }}</span>
-    </a>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <a href="/" class="brand">
+        <div class="brand-icon">A</div>
+        <div class="brand-text">AgencyPulse</div>
+      </a>
+      <nav class="nav-tabs">
+        <a href="/" class="nav-tab {{ if eq .ActiveNav "employee" }}active{{ end }}">⏱️ {{ t .Lang "nav_employee" }}</a>
+        <a href="/teamlead" class="nav-tab {{ if eq .ActiveNav "teamlead" }}active{{ end }}">🛡️ {{ t .Lang "nav_teamlead" }}</a>
+      </nav>
+    </div>
+
 
     <div class="header-controls">
       <button id="theme-toggle-btn" type="button" class="theme-toggle" data-testid="theme-toggle" onclick="toggleTheme()" title="Theme Switcher">

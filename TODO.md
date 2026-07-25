@@ -20,10 +20,11 @@
 
 ---
 
-## ⏳ v0.2.0 — Team Lead Cockpit & Alerts
-- [ ] Budget heatmap (`Target` vs. `Actual`).
-- [ ] Traffic-light alert cards (>80% / >100%).
-- [ ] AI Time & Budget Estimator modal.
+## 🟢 v0.2.0 — Team Lead Cockpit & Alerts (COMPLETED)
+- [x] Budget heatmap (`Target` vs. `Actual`).
+- [x] Traffic-light alert cards (>80% / >100%).
+- [x] AI Time & Budget Estimator modal.
+
 
 ---
 

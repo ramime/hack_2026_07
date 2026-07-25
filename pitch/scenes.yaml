@@ -1,6 +1,6 @@
 # OWNER: Pitch Media pipeline ONLY — Dev-Agent: DO NOT EDIT
 # Screencast scenes + English narration (burned-in captions).
-# Feature inventory comes from pitch/manifest.yaml (Dev-Agent).
+# Tuned for v0.2.0-beta Team Lead Cockpit on localhost:8084.
 # See: pitch/DEV_AGENT_CONTRACT.md
 
 version: "0.2.0-beta.1"
@@ -12,14 +12,14 @@ viewport:
 scenes:
   - id: intro
     path: "/"
-    max_seconds: 8
+    max_seconds: 6
     narration_en: "AgencyPulse — real-time budget pulse for social media agencies."
     steps: []
 
   - id: time_entry
     path: "/"
-    max_seconds: 25
-    narration_en: "Employees log hours against client campaigns. The table updates instantly."
+    max_seconds: 20
+    narration_en: "Employees log hours against campaigns. The table updates instantly."
     steps:
       - action: set_caption
       - action: select
@@ -37,21 +37,32 @@ scenes:
       - action: click
         testid: submit-time-log
       - action: wait
-        ms: 1500
+        ms: 1200
 
-  - id: demo_story
-    path: "/"
-    max_seconds: 20
-    narration_en: "Seeded pitch data: Ritter Sport healthy, Bosch at risk, Porsche over budget."
+  - id: teamlead_heatmap
+    path: "/teamlead"
+    max_seconds: 18
+    narration_en: "Team Lead cockpit: Ritter healthy, Bosch at risk, Porsche over budget."
     steps:
-      - action: click
-        testid: campaign-select
+      - action: set_caption
       - action: wait
-        ms: 2000
+        testid: budget-heatmap
+        ms: 2500
+
+  - id: ai_estimator
+    path: "/teamlead"
+    max_seconds: 16
+    narration_en: "AI Estimator forecasts deliverable effort and compares it to campaign budgets."
+    steps:
+      - action: set_caption
+      - action: click
+        testid: ai-estimator-open
+      - action: wait
+        ms: 3500
 
   - id: reset
-    path: "/"
-    max_seconds: 12
+    path: "/teamlead"
+    max_seconds: 10
     narration_en: "One click restores the demo baseline for the next pitch."
     steps:
       - action: click

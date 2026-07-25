@@ -37,3 +37,15 @@ type TimeLog struct {
 	Description  string    `json:"description"`
 	LoggedAt     time.Time `json:"logged_at"`
 }
+
+type CampaignBudgetSummary struct {
+	CampaignID   int64   `json:"campaign_id"`
+	ClientName   string  `json:"client_name"`
+	CampaignName string  `json:"campaign_name"`
+	TargetBudget float64 `json:"target_budget"`
+	ActualSpend  float64 `json:"actual_spend"`
+	HoursLogged  float64 `json:"hours_logged"`
+	UsagePercent float64 `json:"usage_percent"`
+	Status       string  `json:"status"` // ok, warning, danger
+}
+

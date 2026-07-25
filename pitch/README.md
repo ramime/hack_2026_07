@@ -2,6 +2,9 @@
 
 Release slideshow + screencast pipeline for AgencyPulse.
 
+**Current pitch target:** `v0.2.0-beta` — Employee time tracking + Team Lead cockpit  
+**Primary demo base:** `http://localhost:8084` (Live may lag until the next VPS deploy)
+
 ## Agent boundary
 
 | File | Owner |
@@ -15,66 +18,72 @@ Release slideshow + screencast pipeline for AgencyPulse.
 
 **Pitch pipeline:** owns slides/scenes/capture CLI under `cmd/pitchmedia` and `tools/screencast`.
 
-## Runbook (learn the flow)
+## v0.2 screencast story
 
-Prerequisites: Go, Node/npm, ffmpeg. Playwright Chromium is installed automatically on
-`pitchmedia` run into `~/.cache/ms-playwright`. Manual fallback:
+1. `/` — intro + time entry (HTMX)
+2. `/teamlead` — budget heatmap (Ritter / Bosch / Porsche traffic lights)
+3. `/teamlead` — open AI Time & Budget Estimator modal
+4. Reset demo data for the next pitch
+
+Slides mirror that story in [slides.md](slides.md) (`GET /slides`).
+
+## Runbook
+
+Prerequisites: Go, Node/npm, ffmpeg. Playwright Chromium installs on first `pitchmedia`
+run into `~/.cache/ms-playwright`. Manual fallback:
 
 ```bash
 cd tools/screencast && npx playwright install chromium
 ```
 
-### 1. Start the app
+### 1. Start the v0.2 app
 
 ```bash
 go run ./cmd/agencypulse
-# http://localhost:8084
+# http://localhost:8084  → health should report 0.2.0-beta.x
 ```
 
-### 2. Check slides
+### 2. Check slides & cockpit
 
-Open [http://localhost:8084/slides](http://localhost:8084/slides)  
-Navigate with `←` `→` / Space. Content comes from `pitch/slides.md`.
+- Slides: [http://localhost:8084/slides](http://localhost:8084/slides)
+- Team Lead: [http://localhost:8084/teamlead](http://localhost:8084/teamlead)
 
-### 3. Validate scenes (no browser)
+### 3. Validate scenes
 
 ```bash
 go run ./cmd/pitchmedia -dry-run
 ```
 
-### 4. Capture screencast (default: silent + burned-in captions)
+### 4. Capture screencast (silent + burned-in captions)
 
 ```bash
+# against local v0.2 (default)
 go run ./cmd/pitchmedia
-# equivalent: -tts skip
+
+# against Live only after v0.2 is deployed there
+go run ./cmd/pitchmedia -base https://trw5wo98w.ralf-metzing.de
 ```
 
-What it does:
-
-1. `GET /api/health`
-2. `POST /api/reset-demo-data`
-3. Playwright walkthrough from `pitch/scenes.yaml` with caption overlay
-4. `ffmpeg` → `artifacts/agencypulse-<version>.mp4` (≤ 120s)
+Pipeline: health → reset-demo → Playwright (`scenes.yaml` + captions) → `ffmpeg` →  
+`artifacts/agencypulse-<version>.mp4` (≤ 120s). Default `-tts skip`.
 
 ### 5. Review and iterate
 
 ```bash
 ls -la artifacts/
-# tweak narration / steps in pitch/scenes.yaml, then re-run
+# edit pitch/scenes.yaml or pitch/slides.md, then re-run
 ```
 
 ### 6. Optional voiceover (later)
 
 ```bash
-go run ./cmd/pitchmedia -tts edge        # requires edge-tts
-go run ./cmd/pitchmedia -tts elevenlabs  # stub until API client lands
+go run ./cmd/pitchmedia -tts edge
+go run ./cmd/pitchmedia -tts elevenlabs
 ```
-
-Captions stay burned-in either way.
 
 ### 7. Submission
 
-Upload the MP4 to Loom/Drive manually and set the link in `SUBMISSION.md`.
+Upload the MP4 to Loom/Drive; set the link in `SUBMISSION.md`.
 
 ## Useful flags
 
@@ -91,6 +100,6 @@ Upload the MP4 to Loom/Drive manually and set the link in `SUBMISSION.md`.
 ## Quick links for the Dev-Agent
 
 1. Open [DEV_AGENT_CONTRACT.md](DEV_AGENT_CONTRACT.md)
-2. Update [manifest.yaml](manifest.yaml) when features ship
-3. Keep `data-testid`s stable
-4. Keep `GET /api/health` in sync with the app version
+2. Keep [manifest.yaml](manifest.yaml) in sync (`budget_heatmap` / `ai-estimator-open` shipped for v0.2)
+3. Keep `data-testid`s stable on `/` and `/teamlead`
+4. Keep `GET /api/health` aligned with the app version

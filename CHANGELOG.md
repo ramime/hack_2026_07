@@ -2,7 +2,18 @@
 
 All notable changes to AgencyPulse will be documented in this file.
 
+## [v0.2.0] — 2026-07-25 (Team Lead Cockpit & Budget Drift Alerts Release)
+### Added
+- Team Lead Cockpit (`/teamlead`) with real-time budget heatmap (`Target Budget` vs `Actual Spend` in € and %).
+- Top-level KPI summary cards for **Healthy** (<80%), **Warning** (80–100%), and **Danger** (>100%) campaign budget states.
+- Color-coded progress bars and status badges (Green, Yellow, Red) for client campaigns (Ritter Sport, Bosch, Porsche).
+- Interactive **AI Time & Budget Estimator Modal** (`data-testid="ai-estimator-open"`) for forecasting deliverable hours and budget cost.
+- Navigation header links for role switching between Employee view (`/`) and Team Lead Cockpit (`/teamlead`).
+- Full bilingual i18n support (`locales/de.json` & `locales/en.json`).
+- Updated `pitch/manifest.yaml` with stable `data-testid` hooks (`budget-heatmap`, `ai-estimator-open`).
+
 ## [v0.1.4] — 2026-07-25 (Pitch Media & UI Asset Patch)
+
 ### Added
 - Maintenance and pitch media pipeline alignment release.
 

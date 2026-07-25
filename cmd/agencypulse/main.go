@@ -15,15 +15,21 @@ import (
 	"agencypulse/internal/pitch"
 )
 
-const version = "0.1.4"
+const version = "0.2.0"
+
 
 type PageData struct {
-	Version    string
-	Lang       string
-	Employees  []models.Employee
-	Campaigns  []models.Campaign
-	TimeLogs   []models.TimeLog
-	SuccessMsg string
+	Version         string
+	Lang            string
+	ActiveNav       string
+	Employees       []models.Employee
+	Campaigns       []models.Campaign
+	TimeLogs        []models.TimeLog
+	BudgetSummaries []models.CampaignBudgetSummary
+	CountHealthy    int
+	CountWarning    int
+	CountDanger     int
+	SuccessMsg      string
 }
 
 func main() {
@@ -48,13 +54,20 @@ func main() {
 		log.Fatalf("Failed to load i18n manager: %v", err)
 	}
 
-	tmpl, err := template.New("base").Funcs(template.FuncMap{
+	funcMap := template.FuncMap{
 		"t": func(lang, key string) string {
 			return i18nMgr.T(lang, key)
 		},
-	}).ParseFiles("web/templates/layout.html", "web/templates/employee.html")
+	}
+
+	empTmpl, err := template.New("layout.html").Funcs(funcMap).ParseFiles("web/templates/layout.html", "web/templates/employee.html")
 	if err != nil {
-		log.Fatalf("Failed to parse templates: %v", err)
+		log.Fatalf("Failed to parse employee templates: %v", err)
+	}
+
+	teamleadTmpl, err := template.New("layout.html").Funcs(funcMap).ParseFiles("web/templates/layout.html", "web/templates/teamlead.html")
+	if err != nil {
+		log.Fatalf("Failed to parse teamlead templates: %v", err)
 	}
 
 	slidesTmpl, err := template.ParseFiles("web/templates/slides.html")
@@ -137,13 +150,59 @@ func main() {
 			logs = append(logs, tl)
 		}
 
+		// Fetch budget summaries for Team Lead view
+		summaryRows, err := database.Query(`
+			SELECT 
+				c.id, cl.name, c.name, c.target_budget,
+				COALESCE(SUM(tl.hours * e.hourly_rate), 0) AS actual_spend,
+				COALESCE(SUM(tl.hours), 0) AS hours_logged
+			FROM campaigns c
+			JOIN clients cl ON c.client_id = cl.id
+			LEFT JOIN time_logs tl ON c.id = tl.campaign_id
+			LEFT JOIN employees e ON tl.employee_id = e.id
+			GROUP BY c.id, cl.name, c.name, c.target_budget
+			ORDER BY cl.name ASC, c.name ASC
+		`)
+		if err != nil {
+			return nil, err
+		}
+		defer summaryRows.Close()
+
+		var summaries []models.CampaignBudgetSummary
+		var countHealthy, countWarning, countDanger int
+
+		for summaryRows.Next() {
+			var s models.CampaignBudgetSummary
+			if err := summaryRows.Scan(&s.CampaignID, &s.ClientName, &s.CampaignName, &s.TargetBudget, &s.ActualSpend, &s.HoursLogged); err != nil {
+				return nil, err
+			}
+			if s.TargetBudget > 0 {
+				s.UsagePercent = (s.ActualSpend / s.TargetBudget) * 100.0
+			}
+			if s.UsagePercent > 100.0 {
+				s.Status = "danger"
+				countDanger++
+			} else if s.UsagePercent >= 80.0 {
+				s.Status = "warning"
+				countWarning++
+			} else {
+				s.Status = "ok"
+				countHealthy++
+			}
+			summaries = append(summaries, s)
+		}
+
 		return &PageData{
-			Version:    version,
-			Lang:       lang,
-			Employees:  employees,
-			Campaigns:  campaigns,
-			TimeLogs:   logs,
-			SuccessMsg: successMsg,
+			Version:         version,
+			Lang:            lang,
+			Employees:       employees,
+			Campaigns:       campaigns,
+			TimeLogs:        logs,
+			BudgetSummaries: summaries,
+			CountHealthy:    countHealthy,
+			CountWarning:    countWarning,
+			CountDanger:     countDanger,
+			SuccessMsg:      successMsg,
 		}, nil
 	}
 
@@ -163,7 +222,7 @@ func main() {
 		}
 	})
 
-	// Route: GET /
+	// Route: GET / (Employee View)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
@@ -175,7 +234,22 @@ func main() {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		if err := tmpl.ExecuteTemplate(w, "layout.html", data); err != nil {
+		data.ActiveNav = "employee"
+		if err := empTmpl.ExecuteTemplate(w, "layout.html", data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
+
+	// Route: GET /teamlead (Team Lead Cockpit View)
+	http.HandleFunc("/teamlead", func(w http.ResponseWriter, r *http.Request) {
+		lang := getLang(r)
+		data, err := fetchPageData(lang, "")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		data.ActiveNav = "teamlead"
+		if err := teamleadTmpl.ExecuteTemplate(w, "layout.html", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
@@ -209,10 +283,11 @@ func main() {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		data.ActiveNav = "employee"
 
 		// HTMX request: render "content" block directly
 		if r.Header.Get("HX-Request") == "true" {
-			if err := tmpl.ExecuteTemplate(w, "content", data); err != nil {
+			if err := empTmpl.ExecuteTemplate(w, "content", data); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
 			return
@@ -240,9 +315,10 @@ func main() {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		data.ActiveNav = "employee"
 
 		if r.Header.Get("HX-Request") == "true" {
-			if err := tmpl.ExecuteTemplate(w, "content", data); err != nil {
+			if err := empTmpl.ExecuteTemplate(w, "content", data); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
 			return
@@ -250,6 +326,7 @@ func main() {
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	})
+
 
 	// Route: GET /api/health
 	http.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {

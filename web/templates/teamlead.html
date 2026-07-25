@@ -1,0 +1,189 @@
+{{ define "content" }}
+{{ if .SuccessMsg }}
+<div class="alert-toast">
+  ✓ {{ .SuccessMsg }}
+</div>
+{{ end }}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+  <div>
+    <h1 style="font-size: 1.75rem; font-weight: 800;">🛡️ {{ t .Lang "cockpit_title" }}</h1>
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">{{ t .Lang "cockpit_subtitle" }}</p>
+  </div>
+  <button type="button" class="btn-primary" data-testid="ai-estimator-open" onclick="openEstimatorModal()">
+    {{ t .Lang "estimator_button" }}
+  </button>
+</div>
+
+<!-- Top KPI Summary Cards -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <span class="stat-label">{{ t .Lang "kpi_total_campaigns" }}</span>
+    <span class="stat-value" style="color: var(--accent-primary);">{{ len .BudgetSummaries }}</span>
+  </div>
+  <div class="stat-card stat-ok">
+    <span class="stat-label">{{ t .Lang "kpi_healthy" }}</span>
+    <span class="stat-value">{{ .CountHealthy }}</span>
+  </div>
+  <div class="stat-card stat-warning">
+    <span class="stat-label">{{ t .Lang "kpi_warning" }}</span>
+    <span class="stat-value">{{ .CountWarning }}</span>
+  </div>
+  <div class="stat-card stat-danger">
+    <span class="stat-label">{{ t .Lang "kpi_danger" }}</span>
+    <span class="stat-value">{{ .CountDanger }}</span>
+  </div>
+</div>
+
+<!-- Budget Heatmap Cards -->
+<div class="card" data-testid="budget-heatmap">
+  <h2 class="card-title">🔥 {{ t .Lang "heatmap_title" }}</h2>
+  <div class="heatmap-grid">
+    {{ range .BudgetSummaries }}
+    <div class="heatmap-card">
+      <div class="heatmap-header">
+        <div>
+          <span class="heatmap-client">{{ .ClientName }}</span>
+          <h3 class="heatmap-title">{{ .CampaignName }}</h3>
+        </div>
+        {{ if eq .Status "ok" }}
+          <span class="badge badge-green">{{ t $.Lang "status_in_budget" }}</span>
+        {{ else if eq .Status "warning" }}
+          <span class="badge badge-yellow">{{ t $.Lang "status_warning" }}</span>
+        {{ else }}
+          <span class="badge badge-red">{{ t $.Lang "status_danger" }}</span>
+        {{ end }}
+      </div>
+
+      <div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill {{ if eq .Status "ok" }}fill-ok{{ else if eq .Status "warning" }}fill-warning{{ else }}fill-danger{{ end }}" style="width: {{ if gt .UsagePercent 100.0 }}100{{ else }}{{ printf "%.1f" .UsagePercent }}{{ end }}%;"></div>
+        </div>
+      </div>
+
+      <div class="heatmap-metrics">
+        <div class="metric-item">
+          <span class="metric-label">{{ t $.Lang "target_budget" }}</span>
+          <span class="metric-val">€ {{ printf "%.0f" .TargetBudget }}</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">{{ t $.Lang "actual_spend" }}</span>
+          <span class="metric-val" style="{{ if eq .Status "danger" }}color: var(--status-danger);{{ end }}">€ {{ printf "%.0f" .ActualSpend }}</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">{{ t $.Lang "usage" }}</span>
+          <span class="metric-val">{{ printf "%.1f" .UsagePercent }}%</span>
+        </div>
+      </div>
+    </div>
+    {{ end }}
+  </div>
+</div>
+
+<!-- AI Time & Budget Estimator Modal -->
+<div id="estimator-modal" class="modal-overlay" onclick="if(event.target===this) closeEstimatorModal()">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 style="font-size: 1.25rem; font-weight: 800;">{{ t .Lang "estimator_title" }}</h2>
+      <button type="button" class="modal-close" onclick="closeEstimatorModal()">&times;</button>
+    </div>
+
+    <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;">
+      {{ t .Lang "estimator_desc" }}
+    </p>
+
+    <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+      <div class="form-group">
+        <label for="est-tiktoks">{{ t .Lang "deliverable_tiktoks" }}</label>
+        <input type="number" id="est-tiktoks" class="form-control" value="3" min="0" oninput="calculateEstimate()">
+      </div>
+
+      <div class="form-group">
+        <label for="est-motion">{{ t .Lang "deliverable_motion" }}</label>
+        <input type="number" id="est-motion" class="form-control" value="2" min="0" oninput="calculateEstimate()">
+      </div>
+
+      <div class="form-group">
+        <label for="est-strategy">{{ t .Lang "deliverable_strategy" }}</label>
+        <input type="number" id="est-strategy" class="form-control" value="5" min="0" oninput="calculateEstimate()">
+      </div>
+
+      <div class="form-group">
+        <label for="est-rate">{{ t .Lang "hourly_rate_avg" }}</label>
+        <input type="number" id="est-rate" class="form-control" value="95" min="1" oninput="calculateEstimate()">
+      </div>
+
+      <div class="form-group" style="grid-column: 1 / -1;">
+        <label for="est-campaign">{{ t .Lang "compare_campaign" }}</label>
+        <select id="est-campaign" class="form-control" onchange="calculateEstimate()">
+          <option value="0">-- {{ t .Lang "select_campaign" }} --</option>
+          {{ range .BudgetSummaries }}
+          <option value="{{ .TargetBudget }}">{{ .ClientName }} — {{ .CampaignName }} (€ {{ printf "%.0f" .TargetBudget }})</option>
+          {{ end }}
+        </select>
+      </div>
+    </div>
+
+    <div style="background: var(--input-bg); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-top: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">{{ t .Lang "estimated_total_hours" }}:</span>
+        <strong id="res-hours" style="font-size: 1.1rem; color: var(--accent-primary);">26 h</strong>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">{{ t .Lang "estimated_total_cost" }}:</span>
+        <strong id="res-cost" style="font-size: 1.25rem; font-weight: 800; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">€ 2,470</strong>
+      </div>
+      <div id="res-comparison" style="margin-top: 0.75rem; font-size: 0.8rem; font-weight: 600; text-align: right; display: none;"></div>
+    </div>
+
+    <div style="margin-top: 1.5rem; text-align: right;">
+      <button type="button" class="btn-secondary" onclick="closeEstimatorModal()">
+        {{ t .Lang "btn_close" }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openEstimatorModal() {
+    document.getElementById('estimator-modal').classList.add('open');
+    calculateEstimate();
+  }
+
+  function closeEstimatorModal() {
+    document.getElementById('estimator-modal').classList.remove('open');
+  }
+
+  function calculateEstimate() {
+    const tiktoks = parseFloat(document.getElementById('est-tiktoks').value) || 0;
+    const motion = parseFloat(document.getElementById('est-motion').value) || 0;
+    const strategy = parseFloat(document.getElementById('est-strategy').value) || 0;
+    const rate = parseFloat(document.getElementById('est-rate').value) || 0;
+
+    const totalHours = (tiktoks * 3) + (motion * 6) + strategy;
+    const totalCost = totalHours * rate;
+
+    document.getElementById('res-hours').textContent = totalHours.toFixed(1) + ' h';
+    document.getElementById('res-cost').textContent = '€ ' + totalCost.toLocaleString('de-DE');
+
+    const campTarget = parseFloat(document.getElementById('est-campaign').value) || 0;
+    const compEl = document.getElementById('res-comparison');
+    if (campTarget > 0) {
+      const pct = (totalCost / campTarget) * 100;
+      compEl.style.display = 'block';
+      if (pct > 100) {
+        compEl.style.color = 'var(--status-danger)';
+        compEl.textContent = '⚠️ ' + pct.toFixed(0) + '% ' + '{{ t .Lang "status_danger" }}';
+      } else if (pct > 80) {
+        compEl.style.color = 'var(--status-warning)';
+        compEl.textContent = '⚡ ' + pct.toFixed(0) + '% ' + '{{ t .Lang "status_warning" }}';
+      } else {
+        compEl.style.color = 'var(--status-ok)';
+        compEl.textContent = '✓ ' + pct.toFixed(0) + '% ' + '{{ t .Lang "status_in_budget" }}';
+      }
+    } else {
+      compEl.style.display = 'none';
+    }
+  }
+</script>
+{{ end }}
