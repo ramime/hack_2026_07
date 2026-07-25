@@ -2,6 +2,11 @@
 
 All notable changes to AgencyPulse will be documented in this file.
 
+## [v0.7.3] — 2026-07-25 (Vector SVG Logo Integration Release)
+### Added
+- Vector SVG App Logos (`web/static/logo-icon.svg` & `web/static/logo.svg`) featuring a modern geometric pulse-wave letter 'A' badge with indigo-purple gradient aura.
+- Favicon integration across all views (`layout.html`, `kiosk.html`, `portal.html`).
+
 ## [v0.7.2] — 2026-07-25 (Full Origin Portal URL Resolution Patch Release)
 ### Fixed
 - Portal Link input fields in `/masterdata?tab=portal` now automatically populate with complete, full origin URLs (e.g. `http://localhost:8084/portal/c/<token>` or `https://<domain>/portal/c/<token>`).

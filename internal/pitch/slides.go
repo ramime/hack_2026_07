@@ -107,13 +107,19 @@ func renderBody(body string) string {
 				inList = true
 			}
 			b.WriteString("<li>")
-			b.WriteString(escapeHTML(strings.TrimSpace(trim[2:])))
+			b.WriteString(inlineMarkdown(strings.TrimSpace(trim[2:])))
 			b.WriteString("</li>")
 			continue
 		}
 		flushList()
+		if strings.HasPrefix(trim, "**") && strings.HasSuffix(trim, "**") && len(trim) > 4 && !strings.Contains(trim[2:len(trim)-2], "**") {
+			b.WriteString("<p class=\"slide-label\"><strong>")
+			b.WriteString(escapeHTML(trim[2 : len(trim)-2]))
+			b.WriteString("</strong></p>")
+			continue
+		}
 		b.WriteString("<p>")
-		b.WriteString(escapeHTML(trim))
+		b.WriteString(inlineMarkdown(trim))
 		b.WriteString("</p>")
 	}
 	flushList()
@@ -150,4 +156,29 @@ func escapeHTML(s string) string {
 		`"`, "&quot;",
 	)
 	return replacer.Replace(s)
+}
+
+// inlineMarkdown supports a minimal **bold** subset after HTML escaping.
+func inlineMarkdown(s string) string {
+	escaped := escapeHTML(s)
+	var b strings.Builder
+	for {
+		start := strings.Index(escaped, "**")
+		if start < 0 {
+			b.WriteString(escaped)
+			break
+		}
+		rest := escaped[start+2:]
+		end := strings.Index(rest, "**")
+		if end < 0 {
+			b.WriteString(escaped)
+			break
+		}
+		b.WriteString(escaped[:start])
+		b.WriteString("<strong>")
+		b.WriteString(rest[:end])
+		b.WriteString("</strong>")
+		escaped = rest[end+2:]
+	}
+	return b.String()
 }

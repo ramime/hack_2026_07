@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ t .Lang "app_title" }} — {{ t .Lang "app_subtitle" }}</title>
   <meta name="description" content="AgencyPulse real-time agency profitability and time tracking tool.">
+  <link rel="icon" type="image/svg+xml" href="/static/logo-icon.svg">
   <link rel="stylesheet" href="/static/styles.css">
   <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
 </head>
@@ -19,7 +20,7 @@
   <header class="header">
     <div style="display: flex; align-items: center; gap: 1rem;">
       <a href="/" class="brand">
-        <div class="brand-icon">A</div>
+        <img src="/static/logo-icon.svg" alt="AgencyPulse" style="width: 36px; height: 36px; border-radius: 10px; filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5));">
         <div class="brand-text">AgencyPulse</div>
       </a>
       <nav class="nav-tabs">

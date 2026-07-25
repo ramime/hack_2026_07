@@ -1,14 +1,14 @@
-# RELEASE_NOTES.md — AgencyPulse v0.7.1
+# RELEASE_NOTES.md — AgencyPulse v0.7.3
 
 **Release Date:** 2026-07-25  
-**Milestone:** Table Formatting & Kiosk Improvements (`v0.7.1`)
+**Milestone:** Vector SVG App Logo Integration (`v0.7.3`)
 
 ---
 
 ## 🎯 Release Summary
 
-Release `v0.7.1` is a patch release fixing table column width wrapping for localized German currency amounts and updating the 800x480 Kiosk header UI.
+Release `v0.7.3` introduces custom vector SVG branding assets (`logo.svg` and `logo-icon.svg`), replacing default text placeholders with a modern, gradient-glowing pulse-wave icon and SVG favicon.
 
 ### Key Highlights
-- **Table Column Formatting**: Applied global `white-space: nowrap;` for data table headers (`th`) and cells (`td`), ensuring currency values (e.g. `57.400,00 €`) and table headings stay clean on a single line.
-- **Kiosk Header UI**: Updated Kiosk header title text to `AgencyPulse Kiosk` without icon, alongside language toggle (`🌐 EN`/`🌐 DE`) and theme switcher (`🌙 Dark`/`☀️ Light`).
+- **Vector SVG Logos (`web/static/logo-icon.svg` & `web/static/logo.svg`)**: Designed crisp SVG logo assets combining a stylized heartbeat pulse-wave, geometric letter 'A', and vibrant indigo-purple gradient badge.
+- **Header & Favicon Integration**: Integrated `logo-icon.svg` in `layout.html` header brand bar and configured `<link rel="icon" type="image/svg+xml" href="/static/logo-icon.svg">` across dashboard and kiosk views.
