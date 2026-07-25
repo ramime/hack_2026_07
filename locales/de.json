@@ -47,6 +47,27 @@
   "estimated_total_hours": "Geschätzte Gesamtstunden",
   "estimated_total_cost": "Geschätztes Gesamtbudget",
   "compare_campaign": "Kampagnen-Budget zum Vergleich",
-  "btn_close": "Schließen"
+  "btn_close": "Schließen",
+  "executive_title": "Executive Cockpit & Profitabilität",
+  "executive_subtitle": "Finanzielle KPIs, Deckungsbeiträge & Audio-Briefing",
+  "total_revenue": "Gesamtumsatz",
+  "total_labor_cost": "Personalkosten",
+  "net_profit": "Nettogewinn",
+  "agency_margin": "Agenturmarge",
+  "at_risk_campaigns": "Gefährdete Kampagnen",
+  "client_profitability": "Kunden-Profitabilität & Umsatz",
+  "employee_efficiency": "Mitarbeiter-Effizienz & Stundensätze",
+  "th_client": "Kunde",
+  "th_campaigns_count": "Kampagnen",
+  "th_billed_revenue": "Umsatz (€)",
+  "th_labor_cost": "Kosten (€)",
+  "th_net_profit": "Gewinn (€)",
+  "th_margin": "Marge (%)",
+  "th_role": "Rolle",
+  "th_cost_rate": "Kostensatz (€/h)",
+  "th_billing_rate": "Stundensatz (€/h)",
+  "audio_briefing_title": "🔊 ElevenLabs Voice Briefing",
+  "audio_briefing_desc": "Generiert ein automatisches 15-Sekunden Audio-Briefing zur aktuellen finanziellen Lage.",
+  "play_audio_briefing": "🔊 Briefing abspielen"
 }
 

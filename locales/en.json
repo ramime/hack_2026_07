@@ -47,6 +47,27 @@
   "estimated_total_hours": "Estimated Total Hours",
   "estimated_total_cost": "Estimated Total Budget",
   "compare_campaign": "Compare with Campaign Budget",
-  "btn_close": "Close"
+  "btn_close": "Close",
+  "executive_title": "Executive Cockpit & Profitability",
+  "executive_subtitle": "Financial KPIs, Margins & Audio Briefing",
+  "total_revenue": "Total Revenue",
+  "total_labor_cost": "Labor Cost",
+  "net_profit": "Net Profit",
+  "agency_margin": "Agency Margin",
+  "at_risk_campaigns": "At-Risk Campaigns",
+  "client_profitability": "Client Profitability & Revenue",
+  "employee_efficiency": "Employee Efficiency & Rates",
+  "th_client": "Client",
+  "th_campaigns_count": "Campaigns",
+  "th_billed_revenue": "Revenue (€)",
+  "th_labor_cost": "Labor Cost (€)",
+  "th_net_profit": "Profit (€)",
+  "th_margin": "Margin (%)",
+  "th_role": "Role",
+  "th_cost_rate": "Cost Rate (€/h)",
+  "th_billing_rate": "Billing Rate (€/h)",
+  "audio_briefing_title": "🔊 ElevenLabs Voice Briefing",
+  "audio_briefing_desc": "Generates a 15-second audio executive summary of the current financial status.",
+  "play_audio_briefing": "🔊 Play Audio Briefing"
 }
 

@@ -55,6 +55,14 @@ Time tracking plus a Team Lead cockpit that surfaces budget drift before it hits
 
 ---
 
+# Executive Cockpit
+
+- Real-time revenue, labor cost, net profit, and agency margins %
+- Client profitability & employee efficiency breakdowns
+- Integrated ElevenLabs Voice Briefing for instant audio executive updates
+
+---
+
 # Demo Reset
 
 - One click restores the pitch seed data
@@ -64,6 +72,6 @@ Time tracking plus a Team Lead cockpit that surfaces budget drift before it hits
 
 # What's Next
 
-- Executive profitability KPIs
 - 800×480 kiosk tracker
 - Client portal + security automation
+

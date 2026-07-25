@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -13,9 +14,10 @@ import (
 	"agencypulse/internal/i18n"
 	"agencypulse/internal/models"
 	"agencypulse/internal/pitch"
+	"agencypulse/internal/tts"
 )
 
-const version = "0.2.0"
+const version = "0.3.0"
 
 
 type PageData struct {
@@ -30,6 +32,9 @@ type PageData struct {
 	CountWarning    int
 	CountDanger     int
 	SuccessMsg      string
+	ExecKPIs        models.ExecutiveKPIs
+	ClientProfits   []models.ClientProfitability
+	EmpEfficiencies []models.EmployeeEfficiency
 }
 
 func main() {
@@ -70,6 +75,11 @@ func main() {
 		log.Fatalf("Failed to parse teamlead templates: %v", err)
 	}
 
+	executiveTmpl, err := template.New("layout.html").Funcs(funcMap).ParseFiles("web/templates/layout.html", "web/templates/executive.html")
+	if err != nil {
+		log.Fatalf("Failed to parse executive templates: %v", err)
+	}
+
 	slidesTmpl, err := template.ParseFiles("web/templates/slides.html")
 	if err != nil {
 		log.Fatalf("Failed to parse slides template: %v", err)
@@ -91,7 +101,7 @@ func main() {
 	// Helper to fetch page data
 	fetchPageData := func(lang, successMsg string) (*PageData, error) {
 		// Fetch employees
-		empRows, err := database.Query("SELECT id, name, role, hourly_rate, created_at FROM employees ORDER BY name ASC")
+		empRows, err := database.Query("SELECT id, name, role, hourly_rate, cost_rate, billing_rate, created_at FROM employees ORDER BY name ASC")
 		if err != nil {
 			return nil, err
 		}
@@ -100,8 +110,14 @@ func main() {
 		var employees []models.Employee
 		for empRows.Next() {
 			var emp models.Employee
-			if err := empRows.Scan(&emp.ID, &emp.Name, &emp.Role, &emp.HourlyRate, &emp.CreatedAt); err != nil {
+			if err := empRows.Scan(&emp.ID, &emp.Name, &emp.Role, &emp.HourlyRate, &emp.CostRate, &emp.BillingRate, &emp.CreatedAt); err != nil {
 				return nil, err
+			}
+			if emp.BillingRate == 0 {
+				emp.BillingRate = emp.HourlyRate
+			}
+			if emp.CostRate == 0 {
+				emp.CostRate = emp.BillingRate * 0.5
 			}
 			employees = append(employees, emp)
 		}
@@ -154,7 +170,7 @@ func main() {
 		summaryRows, err := database.Query(`
 			SELECT 
 				c.id, cl.name, c.name, c.target_budget,
-				COALESCE(SUM(tl.hours * e.hourly_rate), 0) AS actual_spend,
+				COALESCE(SUM(tl.hours * COALESCE(NULLIF(e.billing_rate, 0), e.hourly_rate)), 0) AS actual_spend,
 				COALESCE(SUM(tl.hours), 0) AS hours_logged
 			FROM campaigns c
 			JOIN clients cl ON c.client_id = cl.id
@@ -192,6 +208,89 @@ func main() {
 			summaries = append(summaries, s)
 		}
 
+		// Calculate Client Profitability Breakdown
+		clientRows, err := database.Query(`
+			SELECT 
+				cl.id, cl.name,
+				COUNT(DISTINCT c.id) as campaign_count,
+				COALESCE(SUM(tl.hours), 0) as total_hours,
+				COALESCE(SUM(tl.hours * COALESCE(NULLIF(e.billing_rate, 0), e.hourly_rate)), 0) as billed_revenue,
+				COALESCE(SUM(tl.hours * COALESCE(NULLIF(e.cost_rate, 0), e.hourly_rate * 0.5)), 0) as labor_cost
+			FROM clients cl
+			LEFT JOIN campaigns c ON cl.id = c.client_id
+			LEFT JOIN time_logs tl ON c.id = tl.campaign_id
+			LEFT JOIN employees e ON tl.employee_id = e.id
+			GROUP BY cl.id, cl.name
+			ORDER BY cl.name ASC
+		`)
+		if err != nil {
+			return nil, err
+		}
+		defer clientRows.Close()
+
+		var clientProfits []models.ClientProfitability
+		var totalRev, totalCost float64
+
+		for clientRows.Next() {
+			var cp models.ClientProfitability
+			if err := clientRows.Scan(&cp.ClientID, &cp.ClientName, &cp.CampaignCount, &cp.TotalHours, &cp.BilledRevenue, &cp.LaborCost); err != nil {
+				return nil, err
+			}
+			cp.NetProfit = cp.BilledRevenue - cp.LaborCost
+			if cp.BilledRevenue > 0 {
+				cp.MarginPercent = (cp.NetProfit / cp.BilledRevenue) * 100.0
+			}
+			totalRev += cp.BilledRevenue
+			totalCost += cp.LaborCost
+			clientProfits = append(clientProfits, cp)
+		}
+
+		// Calculate Employee Efficiency Breakdown
+		effRows, err := database.Query(`
+			SELECT 
+				e.id, e.name, e.role,
+				COALESCE(NULLIF(e.cost_rate, 0), e.hourly_rate * 0.5) as cost_rate,
+				COALESCE(NULLIF(e.billing_rate, 0), e.hourly_rate) as billing_rate,
+				COALESCE(SUM(tl.hours), 0) as hours_logged
+			FROM employees e
+			LEFT JOIN time_logs tl ON e.id = tl.employee_id
+			GROUP BY e.id, e.name, e.role, e.cost_rate, e.billing_rate, e.hourly_rate
+			ORDER BY e.name ASC
+		`)
+		if err != nil {
+			return nil, err
+		}
+		defer effRows.Close()
+
+		var empEfficiencies []models.EmployeeEfficiency
+		for effRows.Next() {
+			var ee models.EmployeeEfficiency
+			if err := effRows.Scan(&ee.EmployeeID, &ee.EmployeeName, &ee.Role, &ee.CostRate, &ee.BillingRate, &ee.HoursLogged); err != nil {
+				return nil, err
+			}
+			ee.BilledRevenue = ee.HoursLogged * ee.BillingRate
+			ee.LaborCost = ee.HoursLogged * ee.CostRate
+			ee.NetContribution = ee.BilledRevenue - ee.LaborCost
+			if ee.BilledRevenue > 0 {
+				ee.MarginPercent = (ee.NetContribution / ee.BilledRevenue) * 100.0
+			}
+			empEfficiencies = append(empEfficiencies, ee)
+		}
+
+		netProfit := totalRev - totalCost
+		var agencyMargin float64
+		if totalRev > 0 {
+			agencyMargin = (netProfit / totalRev) * 100.0
+		}
+
+		execKPIs := models.ExecutiveKPIs{
+			TotalRevenue:   totalRev,
+			TotalLaborCost: totalCost,
+			NetProfit:      netProfit,
+			AgencyMargin:   agencyMargin,
+			AtRiskCount:    countWarning + countDanger,
+		}
+
 		return &PageData{
 			Version:         version,
 			Lang:            lang,
@@ -203,6 +302,9 @@ func main() {
 			CountWarning:    countWarning,
 			CountDanger:     countDanger,
 			SuccessMsg:      successMsg,
+			ExecKPIs:        execKPIs,
+			ClientProfits:   clientProfits,
+			EmpEfficiencies: empEfficiencies,
 		}, nil
 	}
 
@@ -252,6 +354,49 @@ func main() {
 		if err := teamleadTmpl.ExecuteTemplate(w, "layout.html", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+	})
+
+	// Route: GET /executive (Executive View)
+	http.HandleFunc("/executive", func(w http.ResponseWriter, r *http.Request) {
+		lang := getLang(r)
+		data, err := fetchPageData(lang, "")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		data.ActiveNav = "executive"
+		if err := executiveTmpl.ExecuteTemplate(w, "layout.html", data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
+
+	// Route: GET /api/audio-briefing (ElevenLabs Audio Executive Briefing)
+	http.HandleFunc("/api/audio-briefing", func(w http.ResponseWriter, r *http.Request) {
+		lang := getLang(r)
+		data, err := fetchPageData(lang, "")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		briefingText := fmt.Sprintf(
+			"AgencyPulse Executive Briefing: Total revenue is %d euros with net profit of %d euros and agency margin of %.1f percent. There are %d campaigns currently in warning or danger status.",
+			int(data.ExecKPIs.TotalRevenue),
+			int(data.ExecKPIs.NetProfit),
+			data.ExecKPIs.AgencyMargin,
+			data.ExecKPIs.AtRiskCount,
+		)
+
+		audioBytes, err := tts.GenerateExecutiveAudio(briefingText)
+		if err != nil {
+			http.Error(w, "Failed to generate audio briefing: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "audio/wav")
+		w.Header().Set("Cache-Control", "no-cache")
+		w.WriteHeader(http.StatusOK)
+		w.Write(audioBytes)
 	})
 
 	// Route: POST /api/time-logs

@@ -55,6 +55,8 @@ func (db *DB) createTables() error {
 		name TEXT NOT NULL,
 		role TEXT NOT NULL,
 		hourly_rate REAL NOT NULL,
+		cost_rate REAL DEFAULT 0,
+		billing_rate REAL DEFAULT 0,
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
 
@@ -69,8 +71,15 @@ func (db *DB) createTables() error {
 		FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
 	);
 	`
-	_, err := db.Exec(schema)
-	return err
+	if _, err := db.Exec(schema); err != nil {
+		return err
+	}
+
+	// Migrations for existing database schemas
+	db.Exec("ALTER TABLE employees ADD COLUMN cost_rate REAL DEFAULT 0")
+	db.Exec("ALTER TABLE employees ADD COLUMN billing_rate REAL DEFAULT 0")
+
+	return nil
 }
 
 func (db *DB) SeedDataIfEmpty() error {
@@ -115,10 +124,13 @@ func (db *DB) ResetToSeedData() error {
 	// 3: Porsche - Red (Target 50,000 €)
 	tx.Exec("INSERT INTO campaigns (id, client_id, name, target_budget) VALUES (3, 3, 'Taycan GT Creator Experience', 50000.0)")
 
-	// Insert Employees
-	tx.Exec("INSERT INTO employees (id, name, role, hourly_rate) VALUES (1, 'Sarah Meyer', 'Team Lead', 120.0)")
-	tx.Exec("INSERT INTO employees (id, name, role, hourly_rate) VALUES (2, 'Alex Weber', 'Senior Designer', 95.0)")
-	tx.Exec("INSERT INTO employees (id, name, role, hourly_rate) VALUES (3, 'Max Schmidt', 'Content Creator', 85.0)")
+	// Insert Employees with Cost Rate & Billing Rate
+	// Sarah: Team Lead (Cost: €60/h, Billing: €120/h)
+	tx.Exec("INSERT INTO employees (id, name, role, hourly_rate, cost_rate, billing_rate) VALUES (1, 'Sarah Meyer', 'Team Lead', 120.0, 60.0, 120.0)")
+	// Alex: Senior Designer (Cost: €45/h, Billing: €95/h)
+	tx.Exec("INSERT INTO employees (id, name, role, hourly_rate, cost_rate, billing_rate) VALUES (2, 'Alex Weber', 'Senior Designer', 95.0, 45.0, 95.0)")
+	// Max: Content Creator (Cost: €35/h, Billing: €85/h)
+	tx.Exec("INSERT INTO employees (id, name, role, hourly_rate, cost_rate, billing_rate) VALUES (3, 'Max Schmidt', 'Content Creator', 85.0, 35.0, 85.0)")
 
 	// Insert Initial Time Logs
 	// Ritter Sport logs (~4,500 € total)

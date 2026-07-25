@@ -20,11 +20,13 @@ type Campaign struct {
 }
 
 type Employee struct {
-	ID         int64     `json:"id"`
-	Name       string    `json:"name"`
-	Role       string    `json:"role"`        // dev, design, PM, lead
-	HourlyRate float64   `json:"hourly_rate"` // in EUR
-	CreatedAt  time.Time `json:"created_at"`
+	ID          int64     `json:"id"`
+	Name        string    `json:"name"`
+	Role        string    `json:"role"`        // dev, design, PM, lead
+	HourlyRate  float64   `json:"hourly_rate"` // legacy field/billing rate
+	CostRate    float64   `json:"cost_rate"`   // internal labor cost rate in EUR/h
+	BillingRate float64   `json:"billing_rate"`// client billing rate in EUR/h
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type TimeLog struct {
@@ -48,4 +50,37 @@ type CampaignBudgetSummary struct {
 	UsagePercent float64 `json:"usage_percent"`
 	Status       string  `json:"status"` // ok, warning, danger
 }
+
+type ExecutiveKPIs struct {
+	TotalRevenue   float64 `json:"total_revenue"`
+	TotalLaborCost float64 `json:"total_labor_cost"`
+	NetProfit      float64 `json:"net_profit"`
+	AgencyMargin   float64 `json:"agency_margin"`
+	AtRiskCount    int     `json:"at_risk_count"`
+}
+
+type ClientProfitability struct {
+	ClientID      int64   `json:"client_id"`
+	ClientName    string  `json:"client_name"`
+	CampaignCount int     `json:"campaign_count"`
+	TotalHours    float64 `json:"total_hours"`
+	BilledRevenue float64 `json:"billed_revenue"`
+	LaborCost     float64 `json:"labor_cost"`
+	NetProfit     float64 `json:"net_profit"`
+	MarginPercent float64 `json:"margin_percent"`
+}
+
+type EmployeeEfficiency struct {
+	EmployeeID      int64   `json:"employee_id"`
+	EmployeeName    string  `json:"employee_name"`
+	Role            string  `json:"role"`
+	CostRate        float64 `json:"cost_rate"`
+	BillingRate     float64 `json:"billing_rate"`
+	HoursLogged     float64 `json:"hours_logged"`
+	BilledRevenue   float64 `json:"billed_revenue"`
+	LaborCost       float64 `json:"labor_cost"`
+	NetContribution float64 `json:"net_contribution"`
+	MarginPercent   float64 `json:"margin_percent"`
+}
+
 
