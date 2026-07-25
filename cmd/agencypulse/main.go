@@ -15,11 +15,14 @@ import (
 	"agencypulse/internal/db"
 	"agencypulse/internal/i18n"
 	"agencypulse/internal/models"
+	"agencypulse/internal/n8n"
 	"agencypulse/internal/pitch"
 	"agencypulse/internal/tts"
 )
 
-const version = "0.5.1"
+const version = "0.6.0"
+
+
 
 type KioskPageData struct {
 	Version     string
@@ -47,7 +50,14 @@ type PageData struct {
 	EmpEfficiencies []models.EmployeeEfficiency
 }
 
+var (
+	currentN8NWebhookURL = os.Getenv("N8N_WEBHOOK_URL")
+	failedPINAttempts    = make(map[string]int)
+	tokenLockouts        = make(map[string]time.Time)
+)
+
 func main() {
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8084"
@@ -73,6 +83,11 @@ func main() {
 		"t": func(lang, key string) string {
 			return i18nMgr.T(lang, key)
 		},
+		"formatAmount":   i18n.FormatAmount,
+		"formatNumber":   i18n.FormatNumber,
+		"formatPercent":  i18n.FormatPercent,
+		"formatDate":     i18n.FormatDate,
+		"formatDateTime": i18n.FormatDateTime,
 	}
 
 	empTmpl, err := template.New("layout.html").Funcs(funcMap).ParseFiles("web/templates/layout.html", "web/templates/employee.html")
@@ -104,6 +119,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to parse portal templates: %v", err)
 	}
+
+	devStatusTmpl, err := template.New("layout.html").Funcs(funcMap).ParseFiles("web/templates/layout.html", "web/templates/dev_status.html")
+	if err != nil {
+		log.Fatalf("Failed to parse dev_status templates: %v", err)
+	}
+
 
 	// Static file handler
 	fs := http.FileServer(http.Dir("web/static"))
@@ -533,6 +554,114 @@ func main() {
 		}
 	})
 
+	// Helper for rendering /dev/status page
+	renderDevStatusPage := func(w http.ResponseWriter, r *http.Request, successMsg, errorMsg string) {
+		lang := getLang(r)
+		logs, _ := database.GetSecurityLogs(50)
+		data := models.DevStatusData{
+			Version:        version,
+			Lang:           lang,
+			DBJournalMode:  "WAL",
+			SecurityStatus: "Active",
+			N8NWebhookURL:  currentN8NWebhookURL,
+			N8NActive:      strings.TrimSpace(currentN8NWebhookURL) != "",
+			TotalAlerts:    len(logs),
+			Logs:           logs,
+			SuccessMsg:     successMsg,
+			ErrorMsg:       errorMsg,
+		}
+
+		if r.Header.Get("HX-Request") == "true" {
+			if err := devStatusTmpl.ExecuteTemplate(w, "content", data); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+			return
+		}
+
+		type DevPageData struct {
+			models.DevStatusData
+			ActiveNav string
+		}
+		pageData := DevPageData{
+			DevStatusData: data,
+			ActiveNav:     "dev_status",
+		}
+
+		if err := devStatusTmpl.ExecuteTemplate(w, "layout.html", pageData); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+
+	// Route: GET /dev/status
+	http.HandleFunc("/dev/status", func(w http.ResponseWriter, r *http.Request) {
+		renderDevStatusPage(w, r, "", "")
+	})
+
+	// Route: POST /api/dev/update-webhook-url
+	http.HandleFunc("/api/dev/update-webhook-url", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			currentN8NWebhookURL = strings.TrimSpace(r.FormValue("webhook_url"))
+			renderDevStatusPage(w, r, "n8n Webhook Target URL updated successfully!", "")
+			return
+		}
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	})
+
+	// Route: POST /api/dev/simulate-brute-force
+	http.HandleFunc("/api/dev/simulate-brute-force", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			database.LogSecurityEvent("INVALID_PIN", "ritter-sport-8821", "192.168.178.99", 3, "BLOCKED", "Simulated 3x PIN brute force attack on Ritter Sport portal")
+			n8n.DispatchWebhook(currentN8NWebhookURL, n8n.WebhookPayload{
+				Event:     "INVALID_PIN",
+				Token:     "ritter-sport-8821",
+				IP:        "192.168.178.99",
+				Status:    "BLOCKED",
+				Details:   "Simulated 3x PIN brute force attack",
+				Timestamp: time.Now(),
+			})
+			renderDevStatusPage(w, r, "Simulated 3x PIN Brute-Force attack logged and dispatched to n8n!", "")
+			return
+		}
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	})
+
+	// Route: POST /api/dev/simulate-link-scan
+	http.HandleFunc("/api/dev/simulate-link-scan", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			database.LogSecurityEvent("INVALID_LINK_SCAN", "/portal/c/suspicious-hex-scanner", "45.142.120.55", 1, "WARNING", "Simulated automated web crawler scanning invalid portal links")
+			n8n.DispatchWebhook(currentN8NWebhookURL, n8n.WebhookPayload{
+				Event:     "INVALID_LINK_SCAN",
+				Token:     "/portal/c/suspicious-hex-scanner",
+				IP:        "45.142.120.55",
+				Status:    "WARNING",
+				Details:   "Simulated invalid link scan",
+				Timestamp: time.Now(),
+			})
+			renderDevStatusPage(w, r, "Simulated Invalid Link Scan logged and dispatched to n8n!", "")
+			return
+		}
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	})
+
+	// Route: POST /api/dev/simulate-budget-drift
+	http.HandleFunc("/api/dev/simulate-budget-drift", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			database.LogSecurityEvent("BUDGET_DRIFT_ALERT", "Taycan GT Creator Experience", "system", 1, "BLOCKED", "Campaign target budget exceeded (115% usage)")
+			n8n.DispatchWebhook(currentN8NWebhookURL, n8n.WebhookPayload{
+				Event:     "BUDGET_DRIFT_ALERT",
+				Token:     "Taycan GT Creator Experience",
+				IP:        "system",
+				Status:    "BLOCKED",
+				Details:   "Campaign budget limit exceeded (115% usage)",
+				Timestamp: time.Now(),
+			})
+			renderDevStatusPage(w, r, "Simulated Budget Drift alert logged and dispatched to n8n!", "")
+			return
+		}
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	})
+
+
 	// Route: Client Portal (/portal/c/{token})
 	http.HandleFunc("/portal/c/", func(w http.ResponseWriter, r *http.Request) {
 		path := strings.TrimPrefix(r.URL.Path, "/portal/c/")
@@ -550,6 +679,15 @@ func main() {
 
 		client, err := database.GetClientByToken(token)
 		if err != nil || client == nil {
+			database.LogSecurityEvent("INVALID_LINK_SCAN", r.URL.Path, r.RemoteAddr, 1, "WARNING", "Automated web crawler or user scanned non-existent portal URL")
+			n8n.DispatchWebhook(currentN8NWebhookURL, n8n.WebhookPayload{
+				Event:     "INVALID_LINK_SCAN",
+				Token:     r.URL.Path,
+				IP:        r.RemoteAddr,
+				Status:    "WARNING",
+				Details:   "Scan of non-existent portal token URL",
+				Timestamp: time.Now(),
+			})
 			http.NotFound(w, r)
 			return
 		}
@@ -572,6 +710,20 @@ func main() {
 			lang = getLang(r)
 		}
 
+		// Check Lockout
+		if until, locked := tokenLockouts[token]; locked && time.Now().Before(until) {
+			data := models.ClientPortalData{
+				Version:       version,
+				Lang:          lang,
+				Client:        *client,
+				Authenticated: false,
+				ErrorMsg:      i18nMgr.T(lang, "portal_locked_out"),
+			}
+			w.WriteHeader(http.StatusForbidden)
+			portalTmpl.ExecuteTemplate(w, "portal.html", data)
+			return
+		}
+
 		cookie, err := r.Cookie("portal_auth_" + token)
 		authenticated := (err == nil && cookie.Value == "true")
 
@@ -579,6 +731,8 @@ func main() {
 		if action == "auth" && r.Method == http.MethodPost {
 			inputPIN := r.FormValue("pin")
 			if inputPIN == client.PinCode {
+				delete(failedPINAttempts, token)
+				delete(tokenLockouts, token)
 				authenticated = true
 				http.SetCookie(w, &http.Cookie{
 					Name:     "portal_auth_" + token,
@@ -592,17 +746,42 @@ func main() {
 			}
 
 			// Invalid PIN
+			failedPINAttempts[token]++
+			attempts := failedPINAttempts[token]
+			status := "WARNING"
+			errMsg := i18nMgr.T(lang, "portal_pin_invalid")
+			if attempts >= 3 {
+				tokenLockouts[token] = time.Now().Add(15 * time.Minute)
+				status = "BLOCKED"
+				errMsg = i18nMgr.T(lang, "portal_locked_out")
+			}
+
+			database.LogSecurityEvent("INVALID_PIN", token, r.RemoteAddr, attempts, status, fmt.Sprintf("Incorrect PIN attempt (%d/3)", attempts))
+			n8n.DispatchWebhook(currentN8NWebhookURL, n8n.WebhookPayload{
+				Event:     "INVALID_PIN",
+				Token:     token,
+				IP:        r.RemoteAddr,
+				Status:    status,
+				Details:   fmt.Sprintf("Failed PIN attempt (%d/3)", attempts),
+				Timestamp: time.Now(),
+			})
+
 			data := models.ClientPortalData{
 				Version:       version,
 				Lang:          lang,
 				Client:        *client,
 				Authenticated: false,
-				ErrorMsg:      i18nMgr.T(lang, "portal_pin_invalid"),
+				ErrorMsg:      errMsg,
 			}
-			w.WriteHeader(http.StatusUnauthorized)
+			if attempts >= 3 {
+				w.WriteHeader(http.StatusForbidden)
+			} else {
+				w.WriteHeader(http.StatusUnauthorized)
+			}
 			portalTmpl.ExecuteTemplate(w, "portal.html", data)
 			return
 		}
+
 
 		var campaigns []models.CampaignBudgetSummary
 		var assets []models.ContentAsset

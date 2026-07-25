@@ -306,7 +306,7 @@
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <span class="kiosk-client-name">{{ .ClientName }}</span>
         <span class="badge {{ if eq .Status "ok" }}badge-green{{ else if eq .Status "warning" }}badge-yellow{{ else }}badge-red{{ end }}">
-          {{ printf "%.0f" .UsagePercent }}%
+          {{ formatPercent $.Lang .UsagePercent 0 }}
         </span>
       </div>
 
@@ -344,8 +344,8 @@
         </button>
       {{ else }}
         <div class="kiosk-metric-row">
-          <span>Ziel: € {{ printf "%.0f" .TargetBudget }}</span>
-          <span>Ist: € {{ printf "%.0f" .ActualSpend }}</span>
+          <span>{{ t $.Lang "target_budget" }}: {{ formatAmount $.Lang .TargetBudget 0 }}</span>
+          <span>{{ t $.Lang "actual_spend" }}: {{ formatAmount $.Lang .ActualSpend 0 }}</span>
         </div>
         <input type="hidden" id="category-{{ .CampaignID }}" value="{{ .TaskCategory }}">
         <button type="button" class="btn-kiosk-start" 

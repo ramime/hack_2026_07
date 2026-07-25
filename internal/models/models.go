@@ -129,6 +129,31 @@ type ClientPortalData struct {
 	ErrorMsg      string                  `json:"error_msg,omitempty"`
 }
 
+type SecurityLog struct {
+	ID           int64     `json:"id"`
+	EventType    string    `json:"event_type"`   // INVALID_PIN, INVALID_LINK_SCAN, BUDGET_DRIFT_ALERT
+	TargetToken  string    `json:"target_token"` // portal token or URL path
+	IPAddress    string    `json:"ip_address"`
+	AttemptCount int       `json:"attempt_count"`
+	Status       string    `json:"status"`       // WARNING, BLOCKED
+	Details      string    `json:"details"`
+	LoggedAt     time.Time `json:"logged_at"`
+}
+
+type DevStatusData struct {
+	Version        string        `json:"version"`
+	Lang           string        `json:"lang"`
+	DBJournalMode  string        `json:"db_journal_mode"`
+	SecurityStatus string        `json:"security_status"`
+	N8NWebhookURL  string        `json:"n8n_webhook_url"`
+	N8NActive      bool          `json:"n8n_active"`
+	TotalAlerts    int           `json:"total_alerts"`
+	Logs           []SecurityLog `json:"logs"`
+	SuccessMsg     string        `json:"success_msg,omitempty"`
+	ErrorMsg       string        `json:"error_msg,omitempty"`
+}
+
+
 
 
 

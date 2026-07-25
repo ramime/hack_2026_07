@@ -94,6 +94,28 @@
   "portal_asset_status": "Status",
   "portal_delivered_date": "Delivered",
   "portal_lock": "Lock Portal",
-  "share_portal": "Client Portal Link"
+  "share_portal": "Client Portal Link",
+  "nav_dev_status": "Dev Status",
+  "dev_status_title": "🚨 DevTeam Security & Fraud Cockpit",
+  "dev_status_subtitle": "Real-time security monitoring, PIN brute-force detection & n8n webhooks",
+  "dev_sys_db": "SQLite DB Journal",
+  "dev_sys_security": "Security Incident Monitor",
+  "dev_sys_n8n": "n8n Webhook Status",
+  "dev_n8n_url_label": "n8n Webhook Target URL",
+  "dev_btn_save_url": "Save URL",
+  "dev_simulations_title": "⚡ Live Incident Simulations",
+  "dev_sim_brute_force": "💥 Simulate PIN Brute-Force (3x Failed)",
+  "dev_sim_link_scan": "🔍 Simulate Invalid Link Scan",
+  "dev_sim_budget_drift": "📈 Budget Drift Alert (Porsche 115%)",
+  "dev_logs_title": "🛡️ Security & Event Logstream",
+  "th_event_type": "Event Type",
+  "th_target": "Target / Token",
+  "th_ip": "IP Address",
+  "th_attempts": "Attempts",
+  "th_status": "Status",
+  "th_details": "Details",
+  "th_time": "Timestamp",
+  "portal_locked_out": "Access temporarily locked due to multiple failed PIN attempts."
 }
+
 

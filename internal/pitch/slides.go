@@ -85,6 +85,22 @@ func renderBody(body string) string {
 			flushList()
 			continue
 		}
+		if alt, src, ok := parseMarkdownImage(trim); ok {
+			flushList()
+			b.WriteString(`<figure class="slide-shot">`)
+			b.WriteString(`<img src="`)
+			b.WriteString(escapeHTML(src))
+			b.WriteString(`" alt="`)
+			b.WriteString(escapeHTML(alt))
+			b.WriteString(`" loading="lazy">`)
+			if alt != "" {
+				b.WriteString(`<figcaption>`)
+				b.WriteString(escapeHTML(alt))
+				b.WriteString(`</figcaption>`)
+			}
+			b.WriteString(`</figure>`)
+			continue
+		}
 		if strings.HasPrefix(trim, "- ") {
 			if !inList {
 				b.WriteString("<ul>")
@@ -102,6 +118,28 @@ func renderBody(body string) string {
 	}
 	flushList()
 	return b.String()
+}
+
+// parseMarkdownImage parses ![alt](src).
+func parseMarkdownImage(line string) (alt, src string, ok bool) {
+	if !strings.HasPrefix(line, "![") {
+		return "", "", false
+	}
+	rest := line[2:]
+	closeAlt := strings.Index(rest, "](")
+	if closeAlt < 0 {
+		return "", "", false
+	}
+	alt = rest[:closeAlt]
+	rest = rest[closeAlt+2:]
+	if !strings.HasSuffix(rest, ")") {
+		return "", "", false
+	}
+	src = strings.TrimSuffix(rest, ")")
+	if src == "" {
+		return "", "", false
+	}
+	return alt, src, true
 }
 
 func escapeHTML(s string) string {

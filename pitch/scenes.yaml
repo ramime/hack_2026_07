@@ -1,8 +1,7 @@
-# OWNER: Pitch Media pipeline ONLY — Dev-Agent: DO NOT EDIT
-# Screencast for v0.5.0-beta (includes Client Portal).
-# Demo portal: /portal/c/ritter-sport-8821  PIN 1234
+# OWNER: Pitch Media pipeline ONLY
+# Screencast for v0.5.2 — domain focus, ≤2 minutes
 
-version: "0.5.0-beta.1"
+version: "0.5.2"
 lang: en
 viewport:
   width: 1280
@@ -12,13 +11,13 @@ scenes:
   - id: intro
     path: "/"
     max_seconds: 4
-    narration_en: "AgencyPulse — from floor tracking to a secure client portal."
+    narration_en: "AgencyPulse — see budget drift before it hits the client."
     steps: []
 
   - id: time_entry
     path: "/"
-    max_seconds: 14
-    narration_en: "Employees log hours against campaigns. Updates appear instantly."
+    max_seconds: 12
+    narration_en: "Staff log time against campaigns. The ledger updates instantly."
     steps:
       - action: set_caption
       - action: select
@@ -36,21 +35,21 @@ scenes:
       - action: click
         testid: submit-time-log
       - action: wait
-        ms: 900
+        ms: 800
 
   - id: teamlead_heatmap
     path: "/teamlead"
-    max_seconds: 12
-    narration_en: "Team Lead cockpit: Ritter healthy, Bosch at risk, Porsche over budget."
+    max_seconds: 14
+    narration_en: "Team Lead heatmap: Ritter healthy, Bosch at risk, Porsche over budget."
     steps:
       - action: set_caption
       - action: wait
         testid: budget-heatmap
-        ms: 2000
+        ms: 2400
 
   - id: executive
     path: "/executive"
-    max_seconds: 10
+    max_seconds: 11
     narration_en: "Executive view: revenue, labor cost, profit, and agency margin."
     steps:
       - action: set_caption
@@ -60,32 +59,32 @@ scenes:
 
   - id: kiosk
     path: "/tracker"
-    max_seconds: 16
-    narration_en: "800 by 480 kiosk: start and stop live timers on touch cards."
+    max_seconds: 14
+    narration_en: "Floor kiosk: start and stop live timers on touch campaign cards."
     steps:
       - action: set_caption
       - action: wait
         testid: kiosk-start-btn
-        ms: 600
+        ms: 500
       - action: click
         testid: kiosk-start-btn
       - action: wait
         testid: kiosk-stop-btn
-        ms: 2000
+        ms: 1800
       - action: click
         testid: kiosk-stop-btn
       - action: wait
-        ms: 900
+        ms: 700
 
   - id: client_portal
     path: "/portal/c/ritter-sport-8821"
-    max_seconds: 20
-    narration_en: "Client portal: cryptic URL, PIN gate, then transparent budgets and assets."
+    max_seconds: 16
+    narration_en: "Client portal: PIN gate, then transparent budgets without internal rates."
     steps:
       - action: set_caption
       - action: wait
         testid: portal-pin-form
-        ms: 800
+        ms: 600
       - action: fill
         testid: portal-pin-input
         value: "1234"
@@ -93,14 +92,14 @@ scenes:
         testid: portal-submit-pin
       - action: wait
         testid: portal-content
-        ms: 2500
+        ms: 2200
 
   - id: reset
     path: "/teamlead"
-    max_seconds: 7
-    narration_en: "One click restores the demo baseline for the next pitch."
+    max_seconds: 6
+    narration_en: "One click restores the demo baseline."
     steps:
       - action: click
         testid: reset-demo-button
       - action: wait
-        ms: 1000
+        ms: 800

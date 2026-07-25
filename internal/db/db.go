@@ -93,6 +93,17 @@ func (db *DB) createTables() error {
 		delivered_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE
 	);
+
+	CREATE TABLE IF NOT EXISTS security_logs (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		event_type TEXT NOT NULL,
+		target_token TEXT NOT NULL,
+		ip_address TEXT NOT NULL,
+		attempt_count INTEGER DEFAULT 1,
+		status TEXT NOT NULL,
+		details TEXT NOT NULL DEFAULT '',
+		logged_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
 	`
 	if _, err := db.Exec(schema); err != nil {
 		return err
@@ -127,7 +138,7 @@ func (db *DB) ResetToSeedData() error {
 	defer tx.Rollback()
 
 	// Clear existing tables
-	if _, err := tx.Exec("DELETE FROM content_assets; DELETE FROM active_timer_sessions; DELETE FROM time_logs; DELETE FROM campaigns; DELETE FROM clients; DELETE FROM employees;"); err != nil {
+	if _, err := tx.Exec("DELETE FROM security_logs; DELETE FROM content_assets; DELETE FROM active_timer_sessions; DELETE FROM time_logs; DELETE FROM campaigns; DELETE FROM clients; DELETE FROM employees;"); err != nil {
 		return err
 	}
 
@@ -177,6 +188,11 @@ func (db *DB) ResetToSeedData() error {
 	tx.Exec("INSERT INTO content_assets (campaign_id, title, asset_type, status, preview_url, delivered_at) VALUES (2, 'Influencer Unboxing & Demo Cut', 'TikTok Video', 'Delivered', '', DATETIME('now', '-2 days'))")
 	tx.Exec("INSERT INTO content_assets (campaign_id, title, asset_type, status, preview_url, delivered_at) VALUES (3, 'Taycan GT Track Day 4K Master', 'High-End Video', 'Approved', '', DATETIME('now', '-5 days'))")
 	tx.Exec("INSERT INTO content_assets (campaign_id, title, asset_type, status, preview_url, delivered_at) VALUES (3, 'Engine Sound & Spatial Audio Mix', 'Audio Asset', 'Delivered', '', DATETIME('now', '-3 days'))")
+
+	// Insert Sample Security Logs for DevTeam Cockpit
+	tx.Exec("INSERT INTO security_logs (event_type, target_token, ip_address, attempt_count, status, details, logged_at) VALUES ('INVALID_PIN', 'ritter-sport-8821', '192.168.178.45', 1, 'WARNING', 'Incorrect PIN attempt (1/3)', DATETIME('now', '-2 hours'))")
+	tx.Exec("INSERT INTO security_logs (event_type, target_token, ip_address, attempt_count, status, details, logged_at) VALUES ('INVALID_LINK_SCAN', '/portal/c/unknown-hex-9912', '45.142.120.9', 1, 'WARNING', 'Automated web crawler scanned non-existent portal URL', DATETIME('now', '-1 hour'))")
+	tx.Exec("INSERT INTO security_logs (event_type, target_token, ip_address, attempt_count, status, details, logged_at) VALUES ('BUDGET_DRIFT_ALERT', 'Taycan GT Creator Experience', 'system', 1, 'BLOCKED', 'Campaign target budget exceeded (115% usage)', DATETIME('now', '-30 minutes'))")
 
 	return tx.Commit()
 }
@@ -257,4 +273,54 @@ func (db *DB) GetClientCampaignSummaries(clientID int64) ([]models.CampaignBudge
 	}
 	return summaries, nil
 }
+
+func (db *DB) LogSecurityEvent(eventType, targetToken, ipAddress string, attemptCount int, status, details string) (*models.SecurityLog, error) {
+	res, err := db.Exec(`
+		INSERT INTO security_logs (event_type, target_token, ip_address, attempt_count, status, details, logged_at)
+		VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+	`, eventType, targetToken, ipAddress, attemptCount, status, details)
+	if err != nil {
+		return nil, err
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+	return &models.SecurityLog{
+		ID:           id,
+		EventType:    eventType,
+		TargetToken:  targetToken,
+		IPAddress:    ipAddress,
+		AttemptCount: attemptCount,
+		Status:       status,
+		Details:      details,
+	}, nil
+}
+
+func (db *DB) GetSecurityLogs(limit int) ([]models.SecurityLog, error) {
+	if limit <= 0 {
+		limit = 50
+	}
+	rows, err := db.Query(`
+		SELECT id, event_type, target_token, ip_address, attempt_count, status, details, logged_at
+		FROM security_logs
+		ORDER BY id DESC
+		LIMIT ?
+	`, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var logs []models.SecurityLog
+	for rows.Next() {
+		var l models.SecurityLog
+		if err := rows.Scan(&l.ID, &l.EventType, &l.TargetToken, &l.IPAddress, &l.AttemptCount, &l.Status, &l.Details, &l.LoggedAt); err != nil {
+			return nil, err
+		}
+		logs = append(logs, l)
+	}
+	return logs, nil
+}
+
 

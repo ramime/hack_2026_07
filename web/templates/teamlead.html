@@ -19,19 +19,19 @@
 <div class="stats-grid">
   <div class="stat-card">
     <span class="stat-label">{{ t .Lang "kpi_total_campaigns" }}</span>
-    <span class="stat-value" style="color: var(--accent-primary);">{{ len .BudgetSummaries }}</span>
+    <span class="stat-value" style="color: var(--accent-primary);">{{ formatNumber $.Lang (len .BudgetSummaries) 0 }}</span>
   </div>
   <div class="stat-card stat-ok">
     <span class="stat-label">{{ t .Lang "kpi_healthy" }}</span>
-    <span class="stat-value">{{ .CountHealthy }}</span>
+    <span class="stat-value">{{ formatNumber $.Lang .CountHealthy 0 }}</span>
   </div>
   <div class="stat-card stat-warning">
     <span class="stat-label">{{ t .Lang "kpi_warning" }}</span>
-    <span class="stat-value">{{ .CountWarning }}</span>
+    <span class="stat-value">{{ formatNumber $.Lang .CountWarning 0 }}</span>
   </div>
   <div class="stat-card stat-danger">
     <span class="stat-label">{{ t .Lang "kpi_danger" }}</span>
-    <span class="stat-value">{{ .CountDanger }}</span>
+    <span class="stat-value">{{ formatNumber $.Lang .CountDanger 0 }}</span>
   </div>
 </div>
 
@@ -64,15 +64,15 @@
       <div class="heatmap-metrics">
         <div class="metric-item">
           <span class="metric-label">{{ t $.Lang "target_budget" }}</span>
-          <span class="metric-val">€ {{ printf "%.0f" .TargetBudget }}</span>
+          <span class="metric-val">{{ formatAmount $.Lang .TargetBudget 0 }}</span>
         </div>
         <div class="metric-item">
           <span class="metric-label">{{ t $.Lang "actual_spend" }}</span>
-          <span class="metric-val" style="{{ if eq .Status "danger" }}color: var(--status-danger);{{ end }}">€ {{ printf "%.0f" .ActualSpend }}</span>
+          <span class="metric-val" style="{{ if eq .Status "danger" }}color: var(--status-danger);{{ end }}">{{ formatAmount $.Lang .ActualSpend 0 }}</span>
         </div>
         <div class="metric-item">
           <span class="metric-label">{{ t $.Lang "usage" }}</span>
-          <span class="metric-val">{{ printf "%.1f" .UsagePercent }}%</span>
+          <span class="metric-val">{{ formatPercent $.Lang .UsagePercent 1 }}</span>
         </div>
       </div>
       <div style="margin-top: 0.75rem; pt-0.5; border-top: 1px solid rgba(255,255,255,0.05); text-align: right;">
@@ -127,7 +127,7 @@
         <select id="est-campaign" class="form-control" onchange="calculateEstimate()">
           <option value="0">-- {{ t .Lang "select_campaign" }} --</option>
           {{ range .BudgetSummaries }}
-          <option value="{{ .TargetBudget }}">{{ .ClientName }} — {{ .CampaignName }} (€ {{ printf "%.0f" .TargetBudget }})</option>
+          <option value="{{ .TargetBudget }}">{{ .ClientName }} — {{ .CampaignName }} ({{ formatAmount $.Lang .TargetBudget 0 }})</option>
           {{ end }}
         </select>
       </div>
@@ -172,8 +172,9 @@
     const totalHours = (tiktoks * 3) + (motion * 6) + strategy;
     const totalCost = totalHours * rate;
 
-    document.getElementById('res-hours').textContent = totalHours.toFixed(1) + ' h';
-    document.getElementById('res-cost').textContent = '€ ' + totalCost.toLocaleString('de-DE');
+    const lang = '{{ $.Lang }}';
+    document.getElementById('res-hours').textContent = totalHours.toLocaleString(lang === 'de' ? 'de-DE' : 'en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' h';
+    document.getElementById('res-cost').textContent = lang === 'de' ? totalCost.toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' €' : '€' + totalCost.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
     const campTarget = parseFloat(document.getElementById('est-campaign').value) || 0;
     const compEl = document.getElementById('res-comparison');

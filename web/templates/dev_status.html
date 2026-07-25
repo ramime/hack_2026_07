@@ -1,0 +1,127 @@
+{{ define "content" }}
+{{ if .SuccessMsg }}
+<div class="alert-toast">
+  ✓ {{ .SuccessMsg }}
+</div>
+{{ end }}
+{{ if .ErrorMsg }}
+<div class="alert-toast alert-toast-danger">
+  ⚠️ {{ .ErrorMsg }}
+</div>
+{{ end }}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+  <div>
+    <h1 style="font-size: 1.75rem; font-weight: 800;">🚨 {{ t .Lang "dev_status_title" }}</h1>
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">{{ t .Lang "dev_status_subtitle" }}</p>
+  </div>
+</div>
+
+<!-- System Status Indicators -->
+<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 1.5rem;" data-testid="dev-status-kpis">
+  <div class="stat-card stat-ok">
+    <span class="stat-label">{{ t .Lang "dev_sys_db" }}</span>
+    <span class="stat-value" style="font-size: 1.25rem;">🟢 WAL Mode Active</span>
+  </div>
+  <div class="stat-card stat-warning">
+    <span class="stat-label">{{ t .Lang "dev_sys_security" }}</span>
+    <span class="stat-value" style="font-size: 1.25rem;">🛡️ {{ formatNumber $.Lang .TotalAlerts 0 }} Incidents Logged</span>
+  </div>
+  <div class="stat-card {{ if .N8NActive }}stat-ok{{ else }}stat-warning{{ end }}">
+    <span class="stat-label">{{ t .Lang "dev_sys_n8n" }}</span>
+    <span class="stat-value" style="font-size: 1.25rem;">
+      {{ if .N8NActive }}⚡ Webhook Connected{{ else }}🟡 Fallback Simulated Mode{{ end }}
+    </span>
+  </div>
+</div>
+
+<!-- n8n Webhook Configuration & Live Simulation Controls -->
+<div class="card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%); border: 1px solid rgba(255, 255, 255, 0.1);">
+  <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem;">🔗 {{ t .Lang "dev_n8n_url_label" }}</h3>
+  
+  <form hx-post="/api/dev/update-webhook-url" hx-target="#main-content" hx-swap="innerHTML" style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem;">
+    <input type="text" name="webhook_url" value="{{ .N8NWebhookURL }}" placeholder="http://localhost:5678/webhook/agencypulse-alert" style="flex: 1; min-width: 300px; padding: 0.6rem 0.9rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-main); font-family: monospace;" data-testid="n8n-url-input">
+    <button type="submit" class="btn-subtle" style="background: var(--accent-gradient); color: #fff; border: none; font-weight: 600;" data-testid="save-n8n-url-button">
+      💾 {{ t .Lang "dev_btn_save_url" }}
+    </button>
+  </form>
+
+  <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 1.25rem 0;">
+
+  <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;">⚡ {{ t .Lang "dev_simulations_title" }}</h3>
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;" data-testid="dev-simulations-bar">
+    <form hx-post="/api/dev/simulate-brute-force" hx-target="#main-content" hx-swap="innerHTML" style="display: inline-block;">
+      <button type="submit" class="btn-subtle" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171;" data-testid="sim-brute-force-button">
+        {{ t .Lang "dev_sim_brute_force" }}
+      </button>
+    </form>
+    <form hx-post="/api/dev/simulate-link-scan" hx-target="#main-content" hx-swap="innerHTML" style="display: inline-block;">
+      <button type="submit" class="btn-subtle" style="border-color: rgba(245, 158, 11, 0.4); color: #fbbf24;" data-testid="sim-link-scan-button">
+        {{ t .Lang "dev_sim_link_scan" }}
+      </button>
+    </form>
+    <form hx-post="/api/dev/simulate-budget-drift" hx-target="#main-content" hx-swap="innerHTML" style="display: inline-block;">
+      <button type="submit" class="btn-subtle" style="border-color: rgba(168, 85, 247, 0.4); color: #c084fc;" data-testid="sim-budget-drift-button">
+        {{ t .Lang "dev_sim_budget_drift" }}
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Security Incident Logstream Table -->
+<div class="card" style="padding: 1.25rem;">
+  <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+    <span>{{ t .Lang "dev_logs_title" }}</span>
+    <span class="badge" style="background: rgba(99, 102, 241, 0.2); color: var(--accent-light); font-size: 0.8rem;">Live Audit Log</span>
+  </h2>
+
+  <div style="overflow-x: auto;">
+    <table class="data-table" data-testid="security-logs-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>{{ t .Lang "th_event_type" }}</th>
+          <th>{{ t .Lang "th_target" }}</th>
+          <th>{{ t .Lang "th_ip" }}</th>
+          <th>{{ t .Lang "th_attempts" }}</th>
+          <th>{{ t .Lang "th_status" }}</th>
+          <th>{{ t .Lang "th_details" }}</th>
+          <th>{{ t .Lang "th_time" }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range .Logs }}
+        <tr>
+          <td style="font-family: monospace; opacity: 0.7;">#{{ .ID }}</td>
+          <td>
+            <span class="badge" style="
+              {{ if eq .EventType "INVALID_PIN" }}background: rgba(239, 68, 68, 0.2); color: #f87171;
+              {{ else if eq .EventType "INVALID_LINK_SCAN" }}background: rgba(245, 158, 11, 0.2); color: #fbbf24;
+              {{ else }}background: rgba(168, 85, 247, 0.2); color: #c084fc;{{ end }}
+            ">
+              {{ .EventType }}
+            </span>
+          </td>
+          <td style="font-family: monospace; font-size: 0.85rem; color: var(--accent-light);">{{ .TargetToken }}</td>
+          <td style="font-family: monospace; font-size: 0.85rem; color: var(--text-muted);">{{ .IPAddress }}</td>
+          <td><strong>{{ formatNumber $.Lang .AttemptCount 0 }}</strong></td>
+          <td>
+            <span class="badge {{ if eq .Status "BLOCKED" }}badge-danger{{ else }}badge-warning{{ end }}">
+              {{ .Status }}
+            </span>
+          </td>
+          <td style="font-size: 0.85rem;">{{ .Details }}</td>
+          <td style="font-size: 0.8rem; color: var(--text-muted); font-family: monospace;">{{ formatDate $.Lang .LoggedAt }}</td>
+        </tr>
+        {{ else }}
+        <tr>
+          <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+            Keine Sicherheits-Events protokolliert.
+          </td>
+        </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </div>
+</div>
+{{ end }}

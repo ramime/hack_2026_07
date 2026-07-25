@@ -2,6 +2,25 @@
 
 All notable changes to AgencyPulse will be documented in this file.
 
+## [v0.6.0] — 2026-07-25 (Security, Fraud Detection & n8n Automation Release)
+### Added
+- DevTeam Security Cockpit (`/dev/status`) featuring system health cards, live security audit log table, and configurable n8n Webhook Target URL input.
+- SQLite `security_logs` table & database methods (`LogSecurityEvent`, `GetSecurityLogs`) for persistent event logging.
+- Client Portal PIN brute-force protection: locks portal access after 3 failed attempts, logs `BLOCKED` incident, and dispatches webhook.
+- Invalid link scan auditing: logs accesses to non-existent portal tokens (`INVALID_LINK_SCAN`).
+- n8n Webhook Dispatcher module (`internal/n8n/webhook.go`) supporting async POST alerts with fallback simulated logging.
+- Interactive attack simulation buttons on `/dev/status` for PIN brute force, invalid link scan, and campaign budget drift.
+- Navigation header tab for `/dev/status` and full German & English i18n support.
+
+## [v0.5.2] — 2026-07-25 (Number & Date Formatting Localization Release)
+
+### Added
+- Comprehensive i18n number, currency amount, percentage, and date/time formatting helpers (`FormatNumber`, `FormatAmount`, `FormatPercent`, `FormatDate`, `FormatDateTime`).
+- German locale support: thousand dot separators (`1.234,56 €`), decimal commas, formatted dates (`25.07.2026 14:01`).
+- English locale support: thousand comma separators (`€1,234.56`), decimal points, formatted dates (`Jul 25, 2026 14:01`).
+- Updated template displays across Employee, Team Lead, Executive, 800x480 Kiosk, and Client Portal views.
+- Dynamic client-side locale JS formatting for AI Estimator calculation modal.
+
 ## [v0.5.1] — 2026-07-25 (Protected Client Portal & Pitch Slides Release)
 ### Added
 - Anonymized/cryptic client portal URLs (`/portal/c/<token>`) for Ritter Sport (`ritter-sport-8821`), Bosch (`bosch-4492`), and Porsche (`porsche-9102`).

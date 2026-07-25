@@ -62,10 +62,10 @@
       <tbody>
         {{ range .TimeLogs }}
         <tr>
-          <td>{{ .LoggedAt.Format "02.01.2006 15:04" }}</td>
+          <td>{{ formatDateTime $.Lang .LoggedAt }}</td>
           <td><strong>{{ .EmployeeName }}</strong></td>
           <td><span class="badge badge-green">{{ .CampaignName }}</span></td>
-          <td><strong>{{ .Hours }} h</strong></td>
+          <td><strong>{{ formatNumber $.Lang .Hours 1 }} h</strong></td>
           <td>{{ .Description }}</td>
         </tr>
         {{ end }}

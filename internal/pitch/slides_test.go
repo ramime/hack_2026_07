@@ -36,3 +36,17 @@ Hello world.
 		t.Errorf("html1 = %q", slides[1].HTML)
 	}
 }
+
+func TestParseSlidesImage(t *testing.T) {
+	slides := ParseSlides("# Shot\n\n![Heatmap](/static/pitch/heatmap.png)\n")
+	if len(slides) != 1 {
+		t.Fatalf("got %d", len(slides))
+	}
+	html := string(slides[0].HTML)
+	if !strings.Contains(html, `src="/static/pitch/heatmap.png"`) {
+		t.Fatalf("html=%q", html)
+	}
+	if !strings.Contains(html, `class="slide-shot"`) {
+		t.Fatalf("missing figure: %q", html)
+	}
+}

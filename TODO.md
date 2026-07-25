@@ -51,8 +51,11 @@
 
 ---
 
-## ⏳ v0.6.0 — Security & Fraud Detection
-- [ ] DevTeam live security dashboard (`/dev/status`) & n8n webhooks.
+## 🟢 v0.6.0 — Security & Fraud Detection (COMPLETED)
+- [x] DevTeam live security dashboard (`/dev/status`) & n8n webhooks.
+- [x] Automated PIN brute-force detection (3x failed attempts lockout) & invalid link scan logging into SQLite `security_logs`.
+- [x] n8n Webhook Dispatcher with live configurable target URL and incident simulation controls.
+
 
 ---
 

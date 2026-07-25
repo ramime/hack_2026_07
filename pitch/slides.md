@@ -1,78 +1,40 @@
 <!--
-  OWNER: Pitch Media pipeline ONLY — Dev-Agent: DO NOT EDIT
-  Target: v0.5.0-beta — Client Portal + prior cockpit features
-  See: pitch/DEV_AGENT_CONTRACT.md
+  OWNER: Pitch Media pipeline ONLY
+  Target: v0.5.2 — few domain-focused slides with UI screenshots
 -->
 
 # AgencyPulse
 
-Real-time budget pulse for social media agencies.
+See budget drift before it hits the client.
 
 ---
 
-# Problem
+# Budget drift, live
 
-Agencies lose margin when time and budgets drift silently — and clients rarely see clear progress.
+Green, warning, danger — campaign spend against target in one cockpit.
 
----
-
-# Solution
-
-One cockpit from floor tracking to executive margins, plus a secure client portal.
+![Team Lead budget heatmap](/static/pitch/heatmap.png)
 
 ---
 
-# Time Tracking
+# Margins at a glance
 
-- Staff log hours against live campaigns
-- HTMX updates without a full page reload
+Revenue, labor cost, profit, and agency margin for owners.
 
----
-
-# Team Lead Cockpit
-
-- Budget heatmap with traffic-light alerts
-- AI Estimator for deliverable forecasting
+![Executive profitability KPIs](/static/pitch/executive.png)
 
 ---
 
-# Demo Story
+# Client transparency
 
-- Ritter Sport — healthy
-- Bosch — warning near the cap
-- Porsche — over budget
+Opaque portal link + PIN. Budgets and delivered assets — no internal rates.
 
----
-
-# Executive View
-
-- Revenue, labor cost, profit, agency margin
-- ElevenLabs audio briefing
+![Client portal after PIN unlock](/static/pitch/portal.png)
 
 ---
 
-# 800×480 Kiosk
+# Studio floor
 
-- Touch-first `/tracker` for the studio floor
-- Start / Stop with live stopwatches
+800×480 kiosk: start/stop timers on campaign cards.
 
----
-
-# Client Portal
-
-- Opaque links: `/portal/c/<token>`
-- 4-digit PIN gate per client
-- Transparent budgets and delivered assets — no internal rates
-
----
-
-# Demo Reset
-
-- One click restores the pitch seed data
-
----
-
-# What's Next
-
-- Fraud detection and n8n alerts
-- Final pitch polish
+![Hardware kiosk tracker](/static/pitch/kiosk.png)

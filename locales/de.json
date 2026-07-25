@@ -94,6 +94,28 @@
   "portal_asset_status": "Status",
   "portal_delivered_date": "Ausgeliefert",
   "portal_lock": "Portal sperren",
-  "share_portal": "Kunden-Portal Link"
+  "share_portal": "Kunden-Portal Link",
+  "nav_dev_status": "Dev Status",
+  "dev_status_title": "🚨 DevTeam Security & Fraud Cockpit",
+  "dev_status_subtitle": "Echtzeit-Sicherheitsüberwachung, PIN-Brute-Force-Erkennung & n8n Webhooks",
+  "dev_sys_db": "SQLite DB Journal",
+  "dev_sys_security": "Security Incident Monitor",
+  "dev_sys_n8n": "n8n Webhook Status",
+  "dev_n8n_url_label": "n8n Webhook Target URL",
+  "dev_btn_save_url": "URL Speichern",
+  "dev_simulations_title": "⚡ Live Incident Simulationen",
+  "dev_sim_brute_force": "💥 PIN Brute-Force simulieren (3x Falsch)",
+  "dev_sim_link_scan": "🔍 Ungültigen Link-Scan simulieren",
+  "dev_sim_budget_drift": "📈 Budget Drift Alert (Porsche 115%)",
+  "dev_logs_title": "🛡️ Sicherheits- & Event Logstream",
+  "th_event_type": "Event Typ",
+  "th_target": "Ziel / Token",
+  "th_ip": "IP-Adresse",
+  "th_attempts": "Versuche",
+  "th_status": "Status",
+  "th_details": "Details",
+  "th_time": "Zeitpunkt",
+  "portal_locked_out": "Zugriff vorübergehend gesperrt wegen zu vieler fehlerhafter PIN-Eingaben."
 }
+
 
