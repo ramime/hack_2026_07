@@ -66,6 +66,21 @@ html, body.slides-body {
   letter-spacing: -0.02em;
 }
 
+.slide-brand {
+  margin: 0 0 0.75rem;
+}
+
+.slide-brand img {
+  display: block;
+  width: min(240px, 48vw);
+  height: auto;
+  filter: drop-shadow(0 6px 16px rgba(99, 102, 241, 0.3));
+}
+
+.slide-hero .slide-brand img {
+  width: min(280px, 52vw);
+}
+
 .slide-body {
   font-size: clamp(0.95rem, 1.6vw, 1.2rem);
   line-height: 1.45;
@@ -153,9 +168,19 @@ html, body.slides-body {
 }
 
 .slides-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
   color: var(--slides-accent);
   text-decoration: none;
   font-weight: 500;
+}
+
+.slides-chrome-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.45));
 }
 
 .slides-home:hover {

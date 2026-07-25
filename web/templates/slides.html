@@ -4,12 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AgencyPulse — Pitch Slides</title>
+  <link rel="icon" type="image/svg+xml" href="/static/logo-icon.svg">
   <link rel="stylesheet" href="/static/slides.css">
 </head>
 <body class="slides-body">
   <div class="slides-deck" id="deck" tabindex="0">
     {{ range $i, $s := .Slides }}
-    <section class="slide{{ if eq $i 0 }} is-active{{ end }}" data-index="{{ $i }}">
+    <section class="slide{{ if eq $i 0 }} is-active slide-hero{{ end }}" data-index="{{ $i }}">
       <div class="slide-inner">
         {{ if $s.Title }}<h1 class="slide-title">{{ $s.Title }}</h1>{{ end }}
         <div class="slide-body">{{ $s.HTML }}</div>
@@ -19,7 +20,10 @@
   </div>
 
   <footer class="slides-chrome">
-    <a class="slides-home" href="/">← App</a>
+    <a class="slides-home" href="/" aria-label="AgencyPulse app">
+      <img class="slides-chrome-logo" src="/static/logo-icon.svg" alt="" width="28" height="28">
+      <span>App</span>
+    </a>
     <div class="slides-progress">
       <span id="slide-pos">1</span> / <span id="slide-total">{{ len .Slides }}</span>
       <span class="slides-version">v{{ .Version }}</span>

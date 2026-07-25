@@ -1,14 +1,16 @@
-# RELEASE_NOTES.md — AgencyPulse v0.7.3
+# RELEASE_NOTES.md — AgencyPulse v0.7.4
 
 **Release Date:** 2026-07-25  
-**Milestone:** Vector SVG App Logo Integration (`v0.7.3`)
+**Milestone:** Pitch Slides SVG Branding & Chromes (`v0.7.4`)
 
 ---
 
 ## 🎯 Release Summary
 
-Release `v0.7.3` introduces custom vector SVG branding assets (`logo.svg` and `logo-icon.svg`), replacing default text placeholders with a modern, gradient-glowing pulse-wave icon and SVG favicon.
+Release `v0.7.4` integrates vector SVG branding assets into the `/slides` presentation viewer and deck chromes.
 
 ### Key Highlights
-- **Vector SVG Logos (`web/static/logo-icon.svg` & `web/static/logo.svg`)**: Designed crisp SVG logo assets combining a stylized heartbeat pulse-wave, geometric letter 'A', and vibrant indigo-purple gradient badge.
-- **Header & Favicon Integration**: Integrated `logo-icon.svg` in `layout.html` header brand bar and configured `<link rel="icon" type="image/svg+xml" href="/static/logo-icon.svg">` across dashboard and kiosk views.
+- **SVG Branding in Presentation Deck**: Embedded `/static/logo.svg` directly into the hero slide of `pitch/slides.md`.
+- **Slide Renderer Enhancements**: Added brand logo figure detection (`.slide-brand`) in `internal/pitch/slides.go` preventing caption duplication for logo images.
+- **Unit Testing**: Added `TestParseSlidesBrandLogo` test suite in `internal/pitch/slides_test.go`.
+- **Slide Deck Chrome**: Added `logo-icon.svg` badge to the footer navigation link in `web/templates/slides.html`.

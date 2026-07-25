@@ -50,3 +50,20 @@ func TestParseSlidesImage(t *testing.T) {
 		t.Fatalf("missing figure: %q", html)
 	}
 }
+
+func TestParseSlidesBrandLogo(t *testing.T) {
+	slides := ParseSlides("![AgencyPulse](/static/logo.svg)\n\nIntro copy.\n")
+	if len(slides) != 1 {
+		t.Fatalf("got %d slides", len(slides))
+	}
+	if slides[0].Title != "" {
+		t.Fatalf("title should be empty for logo-led slide, got %q", slides[0].Title)
+	}
+	html := string(slides[0].HTML)
+	if !strings.Contains(html, `class="slide-brand"`) {
+		t.Fatalf("want slide-brand, got %q", html)
+	}
+	if strings.Contains(html, "<figcaption>") {
+		t.Fatalf("brand logo should not use figcaption: %q", html)
+	}
+}

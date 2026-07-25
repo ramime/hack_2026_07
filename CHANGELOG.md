@@ -2,6 +2,11 @@
 
 All notable changes to AgencyPulse will be documented in this file.
 
+## [v0.7.4] — 2026-07-25 (Pitch Slides SVG Branding & Chromes Release)
+### Added
+- Integrated SVG Vector Brand Logos (`/static/logo.svg` & `/static/logo-icon.svg`) directly into `/slides` presentation deck.
+- Added custom slide logo CSS styles (`.slide-brand`, `.slides-chrome-logo`) and unit test suite `TestParseSlidesBrandLogo`.
+
 ## [v0.7.3] — 2026-07-25 (Vector SVG Logo Integration Release)
 ### Added
 - Vector SVG App Logos (`web/static/logo-icon.svg` & `web/static/logo.svg`) featuring a modern geometric pulse-wave letter 'A' badge with indigo-purple gradient aura.

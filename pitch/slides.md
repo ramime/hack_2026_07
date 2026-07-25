@@ -3,7 +3,7 @@
   Target: v0.7.0-beta — Master Data + prior domain story
 -->
 
-# AgencyPulse
+![AgencyPulse](/static/logo.svg)
 
 Social media agencies lose money when work and budgets drift out of sight.
 

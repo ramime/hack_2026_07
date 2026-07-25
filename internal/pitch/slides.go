@@ -87,13 +87,18 @@ func renderBody(body string) string {
 		}
 		if alt, src, ok := parseMarkdownImage(trim); ok {
 			flushList()
-			b.WriteString(`<figure class="slide-shot">`)
+			isBrand := strings.Contains(src, "/static/logo")
+			if isBrand {
+				b.WriteString(`<figure class="slide-brand">`)
+			} else {
+				b.WriteString(`<figure class="slide-shot">`)
+			}
 			b.WriteString(`<img src="`)
 			b.WriteString(escapeHTML(src))
 			b.WriteString(`" alt="`)
 			b.WriteString(escapeHTML(alt))
 			b.WriteString(`" loading="lazy">`)
-			if alt != "" {
+			if alt != "" && !isBrand {
 				b.WriteString(`<figcaption>`)
 				b.WriteString(escapeHTML(alt))
 				b.WriteString(`</figcaption>`)
