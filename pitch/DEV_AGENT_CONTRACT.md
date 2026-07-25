@@ -85,21 +85,46 @@ updating `manifest.yaml` → `demo.entrypoints`.
 | `theme-toggle` | Theme switch control |
 | `reset-demo-button` | Demo reset control in footer |
 
-### Required for v0.2 Team Lead Cockpit (`/teamlead`)
+### Required for v0.2+ Team Lead (`/teamlead`)
 
 | `data-testid` | Element |
 |---------------|---------|
 | `budget-heatmap` | Heatmap card grid wrapper |
 | `ai-estimator-open` | AI Time & Budget Estimator open button |
 
+### Required for v0.3+ Executive (`/executive`)
+
+| `data-testid` | Element |
+|---------------|---------|
+| `executive-kpis` | KPI strip wrapper |
+| `audio-briefing-button` | ElevenLabs briefing play button |
+
+### Required for v0.4 Kiosk (`/tracker`)
+
+| `data-testid` | Element |
+|---------------|---------|
+| `kiosk-start-btn` | Start timer on a campaign card |
+| `kiosk-stop-btn` | Stop active timer |
+| `kiosk-emp-select` | Employee selector on kiosk |
+| `kiosk-back` | Back to dashboard link |
+
+### Required for v0.5 Client Portal (`/portal/c/<token>`)
+
+| `data-testid` | Element |
+|---------------|---------|
+| `portal-pin-form` | PIN login form |
+| `portal-pin-input` | 4-digit PIN field |
+| `portal-submit-pin` | Unlock submit button |
+| `portal-content` | Authenticated portal dashboard |
+| `portal-asset-card` | Delivered content asset card |
+| `portal-logout-btn` | Lock / logout control |
+
+Seed demo tokens must stay stable for screencasts (e.g. Ritter `ritter-sport-8821` / PIN `1234`).
+
 ### Add when later features ship
 
 | `data-testid` | Feature |
 |---------------|---------|
-| `executive-kpis` | Executive profitability view |
-| `audio-briefing-button` | ElevenLabs in-app briefing |
-| `kiosk-start-stop` | `/tracker` kiosk controls |
-| `portal-pin-form` | Client portal PIN gate |
 | `dev-status-panel` | `/dev/status` security dashboard |
 
 ---

@@ -79,6 +79,21 @@
   "preset_video": "🎬 Video Cut",
   "preset_design": "🎨 Design & Assets",
   "preset_concept": "💡 Konzept",
-  "preset_meeting": "📞 Meeting"
+  "preset_meeting": "📞 Meeting",
+  "portal_title": "Kunden-Transparenzportal",
+  "portal_subtitle": "Echtzeit-Kampagnenfortschritt & ausgelieferte Content Assets",
+  "portal_pin_heading": "🔒 Kunden-Zugangsschutz",
+  "portal_pin_desc": "Bitte geben Sie Ihren 4-stelligen PIN-Code ein, um das Dashboard freizuschalten.",
+  "portal_pin_label": "4-stelliger PIN-Code",
+  "portal_btn_unlock": "Dashboard freischalten",
+  "portal_pin_invalid": "Ungültiger PIN-Code. Zugriff verweigert.",
+  "portal_welcome": "Kunden-Dashboard",
+  "portal_budget_overview": "Kampagnen-Budgetfortschritt",
+  "portal_delivered_assets": "Ausgelieferte Content Assets",
+  "portal_asset_type": "Typ",
+  "portal_asset_status": "Status",
+  "portal_delivered_date": "Ausgeliefert",
+  "portal_lock": "Portal sperren",
+  "share_portal": "Kunden-Portal Link"
 }
 

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="{{ .Lang }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ t .Lang "portal_title" }} — {{ .Client.Name }}</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+  <style>
+    body {
+      background-color: #0b0f19;
+      color: #f3f4f6;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    .portal-wrapper {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    .portal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    .portal-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .portal-logo {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: #0b0f19;
+      box-shadow: 0 0 15px rgba(79, 172, 254, 0.4);
+    }
+
+    .portal-client-title {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .portal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.6rem;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #10b981;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+
+    .portal-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .pin-card-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 60vh;
+    }
+
+    .pin-card {
+      background: #111827;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .pin-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .pin-input-group {
+      margin: 1.5rem 0;
+    }
+
+    .pin-input {
+      width: 100%;
+      font-size: 1.75rem;
+      letter-spacing: 0.5rem;
+      text-align: center;
+      padding: 0.75rem;
+      background: #1f2937;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      color: #fff;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .pin-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .error-badge {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .btn-portal-primary {
+      width: 100%;
+      padding: 0.85rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-portal-primary:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+    }
+
+    .asset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+
+    .asset-card {
+      background: #111827;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .asset-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .asset-badge {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .asset-status-Delivered {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .asset-status-Approved {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .asset-status-InReview {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-portal-lock {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #9ca3af;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .btn-portal-lock:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="portal-wrapper">
+    <header class="portal-header">
+      <div class="portal-brand">
+        <div class="portal-logo">AP</div>
+        <div>
+          <h1 class="portal-client-title">{{ .Client.Name }} <span class="portal-badge">🛡️ {{ t .Lang "portal_title" }}</span></h1>
+          <p style="margin: 0.25rem 0 0 0; color: #9ca3af; font-size: 0.875rem;">{{ t .Lang "portal_subtitle" }}</p>
+        </div>
+      </div>
+
+      <div class="portal-actions">
+        <!-- Language Switcher -->
+        <a href="?lang={{ if eq .Lang "de" }}en{{ else }}de{{ end }}" class="btn-portal-lock" data-testid="lang-toggle">
+          🌐 {{ if eq .Lang "de" }}EN{{ else }}DE{{ end }}
+        </a>
+
+        {{ if .Authenticated }}
+        <form action="/portal/c/{{ .Client.PortalToken }}/logout" method="POST" style="margin:0;">
+          <button type="submit" class="btn-portal-lock" data-testid="portal-logout-btn">🔒 {{ t .Lang "portal_lock" }}</button>
+        </form>
+        {{ end }}
+      </div>
+    </header>
+
+    <div id="portal-content-container">
+      {{ if not .Authenticated }}
+      <!-- PIN ACCESS GATE -->
+      <div class="pin-card-container">
+        <div class="pin-card">
+          <div class="pin-icon">🔑</div>
+          <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">{{ t .Lang "portal_pin_heading" }}</h2>
+          <p style="color: #9ca3af; font-size: 0.875rem; margin: 0 0 1.5rem 0;">{{ t .Lang "portal_pin_desc" }}</p>
+
+          {{ if .ErrorMsg }}
+          <div class="error-badge">
+            ⚠️ {{ .ErrorMsg }}
+          </div>
+          {{ end }}
+
+          <form action="/portal/c/{{ .Client.PortalToken }}/auth" method="POST" data-testid="portal-pin-form">
+            <div class="pin-input-group">
+              <input type="password" name="pin" maxlength="4" placeholder="••••" required class="pin-input" autofocus data-testid="portal-pin-input">
+            </div>
+            <button type="submit" class="btn-portal-primary" data-testid="portal-submit-pin">
+              🔓 {{ t .Lang "portal_btn_unlock" }}
+            </button>
+          </form>
+        </div>
+      </div>
+      {{ else }}
+      <!-- AUTHENTICATED CLIENT DASHBOARD -->
+      <div data-testid="portal-content">
+        <!-- Campaign Budget Overview -->
+        <section style="margin-bottom: 2.5rem;">
+          <h2 style="font-size: 1.25rem; margin-bottom: 1rem; color: #f3f4f6; display: flex; align-items: center; gap: 0.5rem;">
+            📊 {{ t .Lang "portal_budget_overview" }}
+          </h2>
+
+          <div class="grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem;">
+            {{ range .Campaigns }}
+            <div class="card" style="background: #111827; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.25rem; border-top: 4px solid {{ if eq .Status "danger" }}#ef4444{{ else if eq .Status "warning" }}#f59e0b{{ else }}#10b981{{ end }};">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+                <h3 style="margin: 0; font-size: 1.1rem;">{{ .CampaignName }}</h3>
+                <span class="asset-badge asset-status-{{ if eq .Status "danger" }}InReview{{ else if eq .Status "warning" }}InReview{{ else }}Approved{{ end }}">
+                  {{ if eq .Status "danger" }}{{ t $.Lang "status_danger" }}{{ else if eq .Status "warning" }}{{ t $.Lang "status_warning" }}{{ else }}{{ t $.Lang "status_in_budget" }}{{ end }}
+                </span>
+              </div>
+
+              <div style="margin: 1rem 0;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.875rem; color: #9ca3af; margin-bottom: 0.35rem;">
+                  <span>{{ t $.Lang "portal_budget_used" }}: <strong>€{{ printf "%.2f" .ActualSpend }}</strong></span>
+                  <span>{{ t $.Lang "portal_target_budget" }}: €{{ printf "%.2f" .TargetBudget }}</span>
+                </div>
+                <div style="background: #1f2937; height: 8px; border-radius: 4px; overflow: hidden;">
+                  <div style="width: {{ if gt .UsagePercent 100.0 }}100{{ else }}{{ printf "%.1f" .UsagePercent }}{{ end }}%; height: 100%; background: {{ if eq .Status "danger" }}#ef4444{{ else if eq .Status "warning" }}#f59e0b{{ else }}#10b981{{ end }}; transition: width 0.3s ease;"></div>
+                </div>
+                <div style="text-align: right; font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">
+                  {{ printf "%.1f" .UsagePercent }}% {{ t $.Lang "usage" }} ({{ printf "%.1f" .HoursLogged }} {{ t $.Lang "logged_hours" }})
+                </div>
+              </div>
+            </div>
+            {{ end }}
+          </div>
+        </section>
+
+        <!-- Delivered Content Assets -->
+        <section>
+          <h2 style="font-size: 1.25rem; margin-bottom: 1rem; color: #f3f4f6; display: flex; align-items: center; gap: 0.5rem;">
+            🎬 {{ t .Lang "portal_delivered_assets" }}
+          </h2>
+
+          <div class="asset-grid">
+            {{ range .ContentAssets }}
+            <div class="asset-card" data-testid="portal-asset-card">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                  <span style="font-size: 0.75rem; color: #9ca3af; font-weight: 500;">{{ .CampaignName }}</span>
+                  <span class="asset-badge asset-status-{{ if eq .Status "Approved" }}Approved{{ else if eq .Status "In Review" }}InReview{{ else }}Delivered{{ end }}">
+                    {{ .Status }}
+                  </span>
+                </div>
+                <h4 style="margin: 0 0 0.5rem 0; font-size: 1rem; color: #f3f4f6;">{{ .Title }}</h4>
+                <div style="font-size: 0.8rem; color: #6b7280;">
+                  ⚡ {{ .AssetType }}
+                </div>
+              </div>
+
+              <div style="margin-top: 1rem; pt-0.5; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #9ca3af;">
+                <span>📅 {{ .DeliveredAt.Format "Jan 02, 2006" }}</span>
+                <span style="color: #60a5fa; font-weight: 500;">Preview Ready →</span>
+              </div>
+            </div>
+            {{ end }}
+          </div>
+        </section>
+      </div>
+      {{ end }}
+    </div>
+  </div>
+
+</body>
+</html>

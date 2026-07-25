@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"agencypulse/internal/db"
@@ -18,7 +19,7 @@ import (
 	"agencypulse/internal/tts"
 )
 
-const version = "0.4.0"
+const version = "0.5.1"
 
 type KioskPageData struct {
 	Version     string
@@ -97,6 +98,11 @@ func main() {
 	slidesTmpl, err := template.ParseFiles("web/templates/slides.html")
 	if err != nil {
 		log.Fatalf("Failed to parse slides template: %v", err)
+	}
+
+	portalTmpl, err := template.New("portal.html").Funcs(funcMap).ParseFiles("web/templates/portal.html")
+	if err != nil {
+		log.Fatalf("Failed to parse portal templates: %v", err)
 	}
 
 	// Static file handler
@@ -523,6 +529,98 @@ func main() {
 		}
 
 		if err := kioskTmpl.ExecuteTemplate(w, "kiosk.html", data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
+
+	// Route: Client Portal (/portal/c/{token})
+	http.HandleFunc("/portal/c/", func(w http.ResponseWriter, r *http.Request) {
+		path := strings.TrimPrefix(r.URL.Path, "/portal/c/")
+		parts := strings.Split(strings.Trim(path, "/"), "/")
+		if len(parts) == 0 || parts[0] == "" {
+			http.NotFound(w, r)
+			return
+		}
+
+		token := parts[0]
+		action := ""
+		if len(parts) > 1 {
+			action = parts[1]
+		}
+
+		client, err := database.GetClientByToken(token)
+		if err != nil || client == nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		// Handle Logout
+		if action == "logout" && r.Method == http.MethodPost {
+			http.SetCookie(w, &http.Cookie{
+				Name:     "portal_auth_" + token,
+				Value:    "",
+				Path:     "/",
+				MaxAge:   -1,
+				HttpOnly: true,
+			})
+			http.Redirect(w, r, "/portal/c/"+token, http.StatusSeeOther)
+			return
+		}
+
+		lang := r.URL.Query().Get("lang")
+		if lang == "" {
+			lang = getLang(r)
+		}
+
+		cookie, err := r.Cookie("portal_auth_" + token)
+		authenticated := (err == nil && cookie.Value == "true")
+
+		// Handle PIN Authentication
+		if action == "auth" && r.Method == http.MethodPost {
+			inputPIN := r.FormValue("pin")
+			if inputPIN == client.PinCode {
+				authenticated = true
+				http.SetCookie(w, &http.Cookie{
+					Name:     "portal_auth_" + token,
+					Value:    "true",
+					Path:     "/",
+					Expires:  time.Now().Add(24 * time.Hour),
+					HttpOnly: true,
+				})
+				http.Redirect(w, r, "/portal/c/"+token, http.StatusSeeOther)
+				return
+			}
+
+			// Invalid PIN
+			data := models.ClientPortalData{
+				Version:       version,
+				Lang:          lang,
+				Client:        *client,
+				Authenticated: false,
+				ErrorMsg:      i18nMgr.T(lang, "portal_pin_invalid"),
+			}
+			w.WriteHeader(http.StatusUnauthorized)
+			portalTmpl.ExecuteTemplate(w, "portal.html", data)
+			return
+		}
+
+		var campaigns []models.CampaignBudgetSummary
+		var assets []models.ContentAsset
+		if authenticated {
+			campaigns, _ = database.GetClientCampaignSummaries(client.ID)
+			assets, _ = database.GetClientContentAssets(client.ID)
+		}
+
+		data := models.ClientPortalData{
+			Version:       version,
+			Lang:          lang,
+			Client:        *client,
+			Campaigns:     campaigns,
+			ContentAssets: assets,
+			Authenticated: authenticated,
+		}
+
+		if err := portalTmpl.ExecuteTemplate(w, "portal.html", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})

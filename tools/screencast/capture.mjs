@@ -85,6 +85,8 @@ async function runStep(page, step, scene) {
 
   if (action === "click") {
     await loc.click();
+    // Allow form navigations (e.g. portal PIN auth) to settle.
+    await page.waitForLoadState("networkidle").catch(() => {});
     return;
   }
   if (action === "fill") {

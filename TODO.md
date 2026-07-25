@@ -43,8 +43,11 @@
 
 ---
 
-## ⏳ v0.5.0 — Protected Client Portal
-- [ ] Cryptic URL routing & 4-digit PIN authentication gate.
+## 🟢 v0.5.0 — Protected Client Portal (COMPLETED)
+- [x] Cryptic URL routing (`/portal/c/<token>`) & 4-digit PIN authentication gate.
+- [x] Client dashboard with campaign budget progress and delivered content assets.
+- [x] Strict privacy separation (internal employee cost rates and margins hidden).
+- [x] i18n support (DE/EN toggle) & session lock/logout.
 
 ---
 

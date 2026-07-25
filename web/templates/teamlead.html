@@ -75,6 +75,15 @@
           <span class="metric-val">{{ printf "%.1f" .UsagePercent }}%</span>
         </div>
       </div>
+      <div style="margin-top: 0.75rem; pt-0.5; border-top: 1px solid rgba(255,255,255,0.05); text-align: right;">
+        {{ if eq .ClientName "Ritter Sport" }}
+        <a href="/portal/c/ritter-sport-8821" target="_blank" style="font-size: 0.75rem; color: var(--accent-primary); text-decoration: none;">🛡️ Client Portal →</a>
+        {{ else if eq .ClientName "Bosch" }}
+        <a href="/portal/c/bosch-4492" target="_blank" style="font-size: 0.75rem; color: var(--accent-primary); text-decoration: none;">🛡️ Client Portal →</a>
+        {{ else if eq .ClientName "Porsche" }}
+        <a href="/portal/c/porsche-9102" target="_blank" style="font-size: 0.75rem; color: var(--accent-primary); text-decoration: none;">🛡️ Client Portal →</a>
+        {{ end }}
+      </div>
     </div>
     {{ end }}
   </div>

@@ -1,7 +1,5 @@
 # OWNER: Dev-Agent only — see pitch/DEV_AGENT_CONTRACT.md
-# Pitch pipeline reads this file; do not put Playwright scripts here.
-version: "0.2.0"
-
+version: "0.5.1"
 updated_at: "2026-07-25"
 
 features:
@@ -11,75 +9,21 @@ features:
     slide_bullets_en:
       - "Staff log time against live campaigns in one form"
       - "Table refreshes without a full page reload"
-      - "Seeded agency cast: Sarah, Alex, Max"
     route: "/"
     status: shipped
     demo:
       reset_required: true
       entrypoints:
         - "[data-testid='time-log-form']"
-        - "[data-testid='employee-select']"
-        - "[data-testid='campaign-select']"
-        - "[data-testid='hours-input']"
-        - "[data-testid='description-input']"
         - "[data-testid='submit-time-log']"
-        - "[data-testid='time-log-table']"
-      notes_en: "Submit a time log; confirm the recent-entries table updates via HTMX."
-
-  - id: demo_seed_story
-    title_en: "Pitch Demo Seed Data"
-    summary_en: "Ritter Sport, Bosch, and Porsche campaigns with green / warning / over-budget narratives."
-    slide_bullets_en:
-      - "Ritter Sport — healthy budget trajectory"
-      - "Bosch — warning zone near budget cap"
-      - "Porsche — over-budget 'out of control' story"
-    route: "/"
-    status: shipped
-    demo:
-      reset_required: true
-      entrypoints:
-        - "[data-testid='campaign-select']"
-        - "[data-testid='reset-demo-button']"
-      notes_en: "Show campaign options after reset; highlight the three client narratives."
-
-  - id: i18n_theme
-    title_en: "i18n & Theme"
-    summary_en: "German/English toggle and dark/light theme for demos."
-    slide_bullets_en:
-      - "One-click DE/EN switch for international pitches"
-      - "Dark/light theme for stage and kiosk lighting"
-    route: "/"
-    status: shipped
-    demo:
-      reset_required: false
-      entrypoints:
-        - "[data-testid='lang-toggle']"
-        - "[data-testid='theme-toggle']"
-      notes_en: "Switch language to EN before screencast; optionally flip theme once."
-
-  - id: demo_reset
-    title_en: "One-Click Demo Reset"
-    summary_en: "Restore the pitch baseline after live tinkering."
-    slide_bullets_en:
-      - "Footer reset restores seed data for the next demo"
-      - "Safe recovery during live pitch sessions"
-    route: "/"
-    status: shipped
-    demo:
-      reset_required: false
-      entrypoints:
-        - "[data-testid='reset-demo-button']"
-      notes_en: "Click reset; confirm seed campaigns/logs return."
-
-  # --- Roadmap (do not claim UI until shipped) ---
+      notes_en: "Submit a time log on /."
 
   - id: budget_heatmap
     title_en: "Team Lead Budget Heatmap"
-    summary_en: "Traffic-light budget drift view and AI Estimator for team leads."
+    summary_en: "Traffic-light budget drift view and AI Estimator."
     slide_bullets_en:
-      - "Green / warning / danger campaign cards (Ritter Sport, Bosch, Porsche)"
-      - "Catch budget drift early with real-time spend calculations"
-      - "AI Time & Budget Estimator for deliverable forecasting"
+      - "Green / warning / danger campaign cards"
+      - "AI Time & Budget Estimator"
     route: "/teamlead"
     status: shipped
     demo:
@@ -87,47 +31,65 @@ features:
       entrypoints:
         - "[data-testid='budget-heatmap']"
         - "[data-testid='ai-estimator-open']"
-      notes_en: "Navigate to /teamlead to view budget heatmap progress cards and trigger the AI Estimator modal."
-
+      notes_en: "Open /teamlead."
 
   - id: executive_view
     title_en: "Executive Profitability"
-    summary_en: "Revenue, labor cost, profit, and margin KPIs."
+    summary_en: "Revenue, labor cost, profit, margins, ElevenLabs briefing."
     slide_bullets_en:
       - "Executive KPIs at a glance"
-      - "Billing vs labor rate clarity"
-    route: "/"
-    status: planned
+      - "Audio briefing button"
+    route: "/executive"
+    status: shipped
     demo:
       reset_required: true
       entrypoints:
         - "[data-testid='executive-kpis']"
-      notes_en: "Not shipped yet."
+        - "[data-testid='audio-briefing-button']"
+      notes_en: "Open /executive."
 
   - id: kiosk_tracker
     title_en: "800×480 Kiosk Tracker"
     summary_en: "Touch-optimized start/stop tracking for the studio floor."
     slide_bullets_en:
-      - "Large touch targets for 800×480 displays"
-      - "Favorite campaign cards with live stopwatches"
+      - "Large touch campaign cards"
+      - "Live stopwatches with Start/Stop"
     route: "/tracker"
-    status: planned
+    status: shipped
     demo:
       reset_required: true
       entrypoints:
-        - "[data-testid='kiosk-start-stop']"
-      notes_en: "Not shipped yet."
+        - "[data-testid='kiosk-start-btn']"
+        - "[data-testid='kiosk-stop-btn']"
+      notes_en: "Open /tracker; start then stop a timer."
 
   - id: client_portal
     title_en: "Client Portal"
-    summary_en: "Opaque portal URLs with PIN gate for client transparency."
+    summary_en: "Opaque portal URLs with PIN authentication and transparent assets."
     slide_bullets_en:
-      - "Cryptic portal links plus 4-digit PIN"
-      - "Clients see progress without internal clutter"
-    route: "/portal/c/demo"
-    status: planned
+      - "Cryptic links: /portal/c/<token>"
+      - "4-digit PIN gate (demo Ritter: 1234)"
+      - "Budgets and delivered assets without internal rates"
+    route: "/portal/c/ritter-sport-8821"
+    status: shipped
     demo:
       reset_required: true
       entrypoints:
         - "[data-testid='portal-pin-form']"
-      notes_en: "Not shipped yet — set real portal path when ready."
+        - "[data-testid='portal-pin-input']"
+        - "[data-testid='portal-submit-pin']"
+        - "[data-testid='portal-content']"
+      notes_en: "Open /portal/c/ritter-sport-8821, enter PIN 1234, show portal content."
+
+  - id: demo_reset
+    title_en: "One-Click Demo Reset"
+    summary_en: "Restore the pitch baseline after live tinkering."
+    slide_bullets_en:
+      - "Footer reset restores seed data"
+    route: "/"
+    status: shipped
+    demo:
+      reset_required: false
+      entrypoints:
+        - "[data-testid='reset-demo-button']"
+      notes_en: "Click reset."

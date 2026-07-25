@@ -79,6 +79,21 @@
   "preset_video": "🎬 Video Cut",
   "preset_design": "🎨 Design & Assets",
   "preset_concept": "💡 Concept",
-  "preset_meeting": "📞 Meeting"
+  "preset_meeting": "📞 Meeting",
+  "portal_title": "Client Transparency Portal",
+  "portal_subtitle": "Real-time campaign budget & delivered content assets",
+  "portal_pin_heading": "🔒 Client Access Gate",
+  "portal_pin_desc": "Please enter your 4-digit PIN to access your client dashboard.",
+  "portal_pin_label": "4-Digit PIN Code",
+  "portal_btn_unlock": "Unlock Dashboard",
+  "portal_pin_invalid": "Invalid PIN code. Access denied.",
+  "portal_welcome": "Client Dashboard",
+  "portal_budget_overview": "Campaign Budget Progress",
+  "portal_delivered_assets": "Delivered Content Assets",
+  "portal_asset_type": "Type",
+  "portal_asset_status": "Status",
+  "portal_delivered_date": "Delivered",
+  "portal_lock": "Lock Portal",
+  "share_portal": "Client Portal Link"
 }
 

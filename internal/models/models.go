@@ -3,9 +3,11 @@ package models
 import "time"
 
 type Client struct {
-	ID        int64     `json:"id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
+	ID          int64     `json:"id"`
+	Name        string    `json:"name"`
+	PortalToken string    `json:"portal_token"`
+	PinCode     string    `json:"pin_code"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type Campaign struct {
@@ -105,6 +107,28 @@ type KioskCard struct {
 	StartedAtUnix int64     `json:"started_at_unix"`
 	TaskCategory  string    `json:"task_category"`
 }
+
+type ContentAsset struct {
+	ID           int64     `json:"id"`
+	CampaignID   int64     `json:"campaign_id"`
+	CampaignName string    `json:"campaign_name,omitempty"`
+	Title        string    `json:"title"`
+	AssetType    string    `json:"asset_type"` // TikTok Video, Instagram Reel, 3D Motion Graphic, etc.
+	Status       string    `json:"status"`     // Delivered, Approved, In Review
+	PreviewURL   string    `json:"preview_url"`
+	DeliveredAt  time.Time `json:"delivered_at"`
+}
+
+type ClientPortalData struct {
+	Version       string                  `json:"version"`
+	Lang          string                  `json:"lang"`
+	Client        Client                  `json:"client"`
+	Campaigns     []CampaignBudgetSummary `json:"campaigns"`
+	ContentAssets []ContentAsset          `json:"content_assets"`
+	Authenticated bool                    `json:"authenticated"`
+	ErrorMsg      string                  `json:"error_msg,omitempty"`
+}
+
 
 
 

@@ -2,6 +2,17 @@
 
 All notable changes to AgencyPulse will be documented in this file.
 
+## [v0.5.1] — 2026-07-25 (Protected Client Portal & Pitch Slides Release)
+### Added
+- Anonymized/cryptic client portal URLs (`/portal/c/<token>`) for Ritter Sport (`ritter-sport-8821`), Bosch (`bosch-4492`), and Porsche (`porsche-9102`).
+- 4-digit PIN security authentication gate (`data-testid="portal-pin-form"`) with invalid PIN error feedback.
+- Client Portal dashboard displaying transparent campaign budget usage and delivered content assets.
+- Confidentiality shield hiding internal employee cost rates, margins, and individual employee names.
+- Direct Client Portal launch links added to Executive Cockpit and Team Lead budget cards.
+- Integrated pitch presentation slide for Client Portal in `pitch/slides.md` and slide viewer (`/slides`).
+- i18n support for client portal in English and German.
+- Updated `pitch/manifest.yaml` marking `client_portal` as shipped for `v0.5.1`.
+
 ## [v0.2.0] — 2026-07-25 (Team Lead Cockpit & Budget Drift Alerts Release)
 ### Added
 - Team Lead Cockpit (`/teamlead`) with real-time budget heatmap (`Target Budget` vs `Actual Spend` in € and %).

@@ -13,7 +13,7 @@
 </div>
 
 <!-- Financial KPI Summary Strip -->
-<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));" data-testid="executive-kpis">
   <div class="stat-card">
     <span class="stat-label">{{ t .Lang "total_revenue" }}</span>
     <span class="stat-value" style="color: var(--accent-primary);">€ {{ printf "%.0f" .ExecKPIs.TotalRevenue }}</span>
@@ -44,7 +44,7 @@
       <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">{{ t .Lang "audio_briefing_desc" }}</p>
     </div>
     <div style="display: flex; align-items: center; gap: 0.75rem;">
-      <button type="button" class="btn-primary" id="btn-play-briefing" onclick="playAudioBriefing()">
+      <button type="button" class="btn-primary" id="btn-play-briefing" data-testid="audio-briefing-button" onclick="playAudioBriefing()">
         {{ t .Lang "play_audio_briefing" }}
       </button>
       <audio id="briefing-player" controls style="display: none; height: 36px;"></audio>
@@ -66,6 +66,7 @@
           <th style="text-align: right;">{{ t .Lang "th_labor_cost" }}</th>
           <th style="text-align: right;">{{ t .Lang "th_net_profit" }}</th>
           <th style="text-align: right;">{{ t .Lang "th_margin" }}</th>
+          <th style="text-align: center;">🔗 {{ t .Lang "share_portal" }}</th>
         </tr>
       </thead>
       <tbody>
@@ -83,6 +84,15 @@
             <span class="badge {{ if lt .MarginPercent 20.0 }}badge-red{{ else if lt .MarginPercent 45.0 }}badge-yellow{{ else }}badge-green{{ end }}">
               {{ printf "%.1f" .MarginPercent }}%
             </span>
+          </td>
+          <td style="text-align: center;">
+            {{ if eq .ClientID 1 }}
+            <a href="/portal/c/ritter-sport-8821" target="_blank" class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.2rem 0.5rem; text-decoration: none;">🛡️ Open Portal</a>
+            {{ else if eq .ClientID 2 }}
+            <a href="/portal/c/bosch-4492" target="_blank" class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.2rem 0.5rem; text-decoration: none;">🛡️ Open Portal</a>
+            {{ else if eq .ClientID 3 }}
+            <a href="/portal/c/porsche-9102" target="_blank" class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.2rem 0.5rem; text-decoration: none;">🛡️ Open Portal</a>
+            {{ end }}
           </td>
         </tr>
         {{ end }}

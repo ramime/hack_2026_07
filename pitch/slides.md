@@ -1,7 +1,6 @@
 <!--
   OWNER: Pitch Media pipeline ONLY — Dev-Agent: DO NOT EDIT
-  Source of slide ideas: pitch/manifest.yaml (Dev-Agent) → rendered here by Pitch
-  Target: v0.2 Team Lead Cockpit (local :8084 / upcoming release)
+  Target: v0.5.0-beta — Client Portal + prior cockpit features
   See: pitch/DEV_AGENT_CONTRACT.md
 -->
 
@@ -13,13 +12,13 @@ Real-time budget pulse for social media agencies.
 
 # Problem
 
-Agencies lose margin when time and budgets drift silently across campaigns.
+Agencies lose margin when time and budgets drift silently — and clients rarely see clear progress.
 
 ---
 
 # Solution
 
-Time tracking plus a Team Lead cockpit that surfaces budget drift before it hits the client.
+One cockpit from floor tracking to executive margins, plus a secure client portal.
 
 ---
 
@@ -27,57 +26,53 @@ Time tracking plus a Team Lead cockpit that surfaces budget drift before it hits
 
 - Staff log hours against live campaigns
 - HTMX updates without a full page reload
-- Seeded cast: Sarah, Alex, Max
 
 ---
 
 # Team Lead Cockpit
 
-- Dedicated `/teamlead` view for budget oversight
-- KPI strip: healthy / warning / danger counts
-- Built for the pitch narrative, not spreadsheet archaeology
+- Budget heatmap with traffic-light alerts
+- AI Estimator for deliverable forecasting
 
 ---
 
-# Budget Heatmap
+# Demo Story
 
-- Green — Ritter Sport under control
-- Warning — Bosch near the cap (~84%)
-- Danger — Porsche over budget (~115%)
-
----
-
-# AI Estimator
-
-- Forecast effort from TikToks, motion, and strategy hours
-- Compare estimated cost against a campaign budget
-- Catch overruns before the work is booked
+- Ritter Sport — healthy
+- Bosch — warning near the cap
+- Porsche — over budget
 
 ---
 
-# Executive Cockpit
+# Executive View
 
-- Real-time revenue, labor cost, net profit, and agency margins %
-- Client profitability & employee efficiency breakdowns
-- Integrated ElevenLabs Voice Briefing for instant audio executive updates
+- Revenue, labor cost, profit, agency margin
+- ElevenLabs audio briefing
 
-# Hardware Kiosk (800×480)
+---
 
-- Dedicated `/tracker` view optimized for 7" Raspberry Pi touchscreens & mobile
-- Live digital stopwatch (`00:14:52`) & glowing green neon pulse animation
-- Single-tap Start/Stop with 15-min agency billing rounding & audio chime
+# 800×480 Kiosk
+
+- Touch-first `/tracker` for the studio floor
+- Start / Stop with live stopwatches
+
+---
+
+# Client Portal
+
+- Opaque links: `/portal/c/<token>`
+- 4-digit PIN gate per client
+- Transparent budgets and delivered assets — no internal rates
 
 ---
 
 # Demo Reset
 
 - One click restores the pitch seed data
-- Safe recovery during live demos
 
 ---
 
 # What's Next
 
-- Client portal + security automation
-
-
+- Fraud detection and n8n alerts
+- Final pitch polish
