@@ -27,21 +27,27 @@ const videoDir = path.join(outDir, "pw-video");
 fs.rmSync(videoDir, { recursive: true, force: true });
 fs.mkdirSync(videoDir, { recursive: true });
 
+// Solid caption plate so text stays readable on light/busy UI.
 const CAPTION_STYLE = `
 #ap-pitch-caption {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
   z-index: 2147483647;
   pointer-events: none;
-  padding: 16px 28px 22px;
-  background: linear-gradient(transparent, rgba(0,0,0,0.78));
-  color: #fff;
+  box-sizing: border-box;
+  max-width: min(1100px, calc(100vw - 32px));
+  padding: 12px 22px;
+  background: rgba(0, 0, 0, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+  color: #ffffff;
   font: 600 20px/1.35 "DM Sans", system-ui, sans-serif;
   text-align: center;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
   letter-spacing: 0.01em;
+  text-shadow: none;
 }
 #ap-pitch-caption[data-empty="1"] { display: none; }
 `;
@@ -55,9 +61,30 @@ async function ensureCaption(page, text) {
       el.id = "ap-pitch-caption";
       document.documentElement.appendChild(el);
     }
+    // Re-apply inline plate styles in case page CSS fights the injected sheet.
+    el.style.cssText = [
+      "position:fixed",
+      "left:50%",
+      "bottom:20px",
+      "transform:translateX(-50%)",
+      "z-index:2147483647",
+      "pointer-events:none",
+      "box-sizing:border-box",
+      "max-width:min(1100px, calc(100vw - 32px))",
+      "padding:12px 22px",
+      "background:rgba(0,0,0,0.92)",
+      "border:1px solid rgba(255,255,255,0.22)",
+      "border-radius:12px",
+      "box-shadow:0 10px 28px rgba(0,0,0,0.55)",
+      "color:#ffffff",
+      "font:600 20px/1.35 DM Sans, system-ui, sans-serif",
+      "text-align:center",
+      "letter-spacing:0.01em",
+    ].join(";");
     const t = (caption || "").trim();
     el.textContent = t;
     el.setAttribute("data-empty", t ? "0" : "1");
+    el.style.display = t ? "block" : "none";
   }, text || "");
 }
 

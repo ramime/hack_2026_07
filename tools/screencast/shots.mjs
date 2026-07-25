@@ -33,6 +33,25 @@ const shots = [
       }
     },
   },
+  {
+    name: "security.png",
+    path: "/dev/status",
+    prep: async (page) => {
+      const btn = page.locator("[data-testid='sim-brute-force-button']");
+      if (await btn.count()) {
+        await btn.click();
+        await page.waitForTimeout(800);
+      }
+    },
+  },
+  {
+    name: "masterdata.png",
+    path: "/masterdata?tab=portal",
+    prep: async (page) => {
+      await page.locator("[data-testid='portal-views-section']").waitFor({ state: "visible", timeout: 10000 }).catch(() => {});
+      await page.waitForTimeout(300);
+    },
+  },
 ];
 
 const browser = await chromium.launch({ headless: true });

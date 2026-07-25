@@ -2,6 +2,22 @@
 
 All notable changes to AgencyPulse will be documented in this file.
 
+## [v0.7.1] — 2026-07-25 (Table Currency Column Width Patch Release)
+### Fixed
+- Added global `white-space: nowrap;` table styles in `web/static/styles.css` preventing currency amounts (`57.400,00 €`) and table headers from wrapping onto multiple lines.
+- Updated 800x480 Kiosk header title text to `AgencyPulse Kiosk` without icon.
+
+## [v0.7.0] — 2026-07-25 (Master Data Management & Client PIN Overview Release)
+### Added
+- Unified Master Data Dashboard (`/masterdata`) with navigation header link `📁 Stammdaten`.
+- Sub-section for **Client Views & PINs**: List of all clients with portal links (`/portal/c/{token}`), PIN codes (`1234`), quick copy button, direct portal opening, and instant PIN update form.
+- Full CRUD management for **Employees (Mitarbeiter)**: Name, Role, Cost Rate (€/h), and Billing Rate (€/h).
+- Full CRUD management for **Clients (Kunden)**: Client Name, Portal Token, and Security PIN Code.
+- Full CRUD management for **Campaigns (Kampagnen)**: Client Assignment, Campaign Title, and Target Budget (€).
+- Database helper methods (`GetAllClients`, `CreateClient`, `UpdateClient`, `DeleteClient`, `GetAllEmployees`, `CreateEmployee`, `UpdateEmployee`, `DeleteEmployee`, `GetAllCampaigns`, `CreateCampaign`, `UpdateCampaign`, `DeleteCampaign`).
+- German and English localization keys in `locales/de.json` and `locales/en.json`.
+- Updated `pitch/manifest.yaml` with feature entry `masterdata_management`.
+
 ## [v0.6.0] — 2026-07-25 (Security, Fraud Detection & n8n Automation Release)
 ### Added
 - DevTeam Security Cockpit (`/dev/status`) featuring system health cards, live security audit log table, and configurable n8n Webhook Target URL input.

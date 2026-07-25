@@ -1,30 +1,29 @@
 # Pitch Media
 
-**Current pitch target:** `v0.5.2`  
+**Current pitch target:** `v0.7.0-beta` — Master Data & Client PIN overview  
 **Primary demo base:** `http://localhost:8084`
 
-## Slides (few, domain-focused)
+## Slides
 
-`pitch/slides.md` — short deck with UI screenshots from `web/static/pitch/`.
-
-Refresh screenshots (app must be running):
+Short domain deck with screenshots → http://localhost:8084/slides
 
 ```bash
 cd tools/screencast && BASE_URL=http://localhost:8084 node shots.mjs
 ```
 
-View: http://localhost:8084/slides
-
 ## Screencast
 
+Captions use a solid black plate for readability.
+
 ```bash
-go run ./cmd/agencypulse
 go run ./cmd/pitchmedia
-# → artifacts/agencypulse-0.5.2.mp4
+# → artifacts/agencypulse-0.7.0-beta.1.mp4
 ```
 
-## Portal demo
+## Key demo URLs
 
-| Client | URL | PIN |
-|--------|-----|-----|
-| Ritter Sport | `/portal/c/ritter-sport-8821` | `1234` |
+| View | URL |
+|------|-----|
+| Master data (portal PINs) | `/masterdata?tab=portal` |
+| Client portal (Ritter) | `/portal/c/ritter-sport-8821` PIN `1234` |
+| Team Lead heatmap | `/teamlead` |

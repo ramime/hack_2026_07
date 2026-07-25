@@ -6,6 +6,14 @@
   <title>{{ t .Lang "kiosk_title" }} — AgencyPulse</title>
   <link rel="stylesheet" href="/static/styles.css">
   <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+</head>
+<body>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('agencypulse_theme') || 'dark';
+      document.body.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
   <style>
     body {
       margin: 0;
@@ -17,6 +25,52 @@
       -webkit-user-select: none;
       overflow-x: hidden;
     }
+
+    body[data-theme="light"] {
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    body[data-theme="light"] .kiosk-header {
+      border-bottom-color: #e2e8f0;
+    }
+    body[data-theme="light"] .kiosk-card {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    body[data-theme="light"] .kiosk-card.active {
+      background: #eff6ff;
+      border-color: #3b82f6;
+    }
+    body[data-theme="light"] .kiosk-client-name {
+      color: #64748b;
+    }
+    body[data-theme="light"] .kiosk-campaign-name {
+      color: #0f172a;
+    }
+    body[data-theme="light"] .stopwatch-digital {
+      color: #2563eb;
+    }
+    body[data-theme="light"] .preset-pill {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #334155;
+    }
+    body[data-theme="light"] .preset-pill.active {
+      background: #dbeafe;
+      border-color: #3b82f6;
+      color: #1d4ed8;
+    }
+    body[data-theme="light"] .emp-selector-pill {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      color: #0f172a;
+    }
+    body[data-theme="light"] .emp-selector-pill select {
+      color: #0f172a;
+      background: #ffffff;
+    }
+
 
     .kiosk-container {
       max-width: 800px;
@@ -266,12 +320,38 @@
       }, 1000);
     }
 
+    function updateThemeUI(theme) {
+      const icon = document.getElementById('kiosk-theme-icon');
+      const text = document.getElementById('kiosk-theme-text');
+      if (icon && text) {
+        if (theme === 'light') {
+          icon.textContent = '☀️';
+          text.textContent = 'Light';
+        } else {
+          icon.textContent = '🌙';
+          text.textContent = 'Dark';
+        }
+      }
+    }
+
+    function toggleTheme() {
+      const current = document.body.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', next);
+      localStorage.setItem('agencypulse_theme', next);
+      updateThemeUI(next);
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       startLiveStopwatches();
+      const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+      updateThemeUI(currentTheme);
     });
 
     document.body.addEventListener("htmx:afterSwap", () => {
       startLiveStopwatches();
+      const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+      updateThemeUI(currentTheme);
     });
   </script>
 </body>
@@ -279,25 +359,41 @@
 
 {{ define "kiosk_cards" }}
 <div class="kiosk-header">
-  <a href="/" class="kiosk-nav-back" data-testid="kiosk-back">
-    {{ t .Lang "back_to_dashboard" }}
-  </a>
+  <div style="display: flex; align-items: center; gap: 0.5rem;">
+    <a href="/" class="kiosk-nav-back" data-testid="kiosk-back">
+      {{ t .Lang "back_to_dashboard" }}
+    </a>
 
-  <div class="kiosk-title-badge">
-    📱 800x480 Kiosk
+    <div class="kiosk-title-badge">
+      AgencyPulse Kiosk
+    </div>
   </div>
 
-  <div class="emp-selector-pill">
-    <span style="font-size: 0.75rem; color: #9ca3af;">👤</span>
-    <select name="employee_id" hx-get="/tracker" hx-target="#kiosk-content" hx-swap="innerHTML" data-testid="kiosk-emp-select">
-      {{ range .Employees }}
-      <option value="{{ .ID }}" {{ if eq .ID $.ActiveEmpID }}selected{{ end }}>
-        {{ .Name }} ({{ .Role }})
-      </option>
-      {{ end }}
-    </select>
+  <div style="display: flex; align-items: center; gap: 0.5rem;">
+    <button id="kiosk-theme-toggle-btn" type="button" class="theme-toggle" data-testid="kiosk-theme-toggle" onclick="toggleTheme()" title="Theme Switcher" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; border-radius: 8px;">
+      <span id="kiosk-theme-icon">🌙</span> <span id="kiosk-theme-text">Dark</span>
+    </button>
+
+    <form hx-post="/api/set-language" style="display: inline-block; margin: 0;">
+      <input type="hidden" name="lang" value="{{ if eq .Lang "de" }}en{{ else }}de{{ end }}">
+      <button type="submit" class="lang-toggle" data-testid="kiosk-lang-toggle" style="padding: 0.35rem 0.6rem; font-size: 0.8rem; border-radius: 8px;">
+        🌐 {{ if eq .Lang "de" }}EN{{ else }}DE{{ end }}
+      </button>
+    </form>
+
+    <div class="emp-selector-pill">
+      <span style="font-size: 0.75rem; color: #9ca3af;">👤</span>
+      <select name="employee_id" hx-get="/tracker" hx-target="#kiosk-content" hx-swap="innerHTML" data-testid="kiosk-emp-select">
+        {{ range .Employees }}
+        <option value="{{ .ID }}" {{ if eq .ID $.ActiveEmpID }}selected{{ end }}>
+          {{ .Name }} ({{ .Role }})
+        </option>
+        {{ end }}
+      </select>
+    </div>
   </div>
 </div>
+
 
 <div class="kiosk-grid">
   {{ range .Cards }}

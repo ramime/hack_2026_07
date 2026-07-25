@@ -153,6 +153,19 @@ type DevStatusData struct {
 	ErrorMsg       string        `json:"error_msg,omitempty"`
 }
 
+type MasterDataPageData struct {
+	Version    string     `json:"version"`
+	Lang       string     `json:"lang"`
+	ActiveNav  string     `json:"active_nav"`
+	ActiveTab  string     `json:"active_tab"`
+	Clients    []Client   `json:"clients"`
+	Employees  []Employee `json:"employees"`
+	Campaigns  []Campaign `json:"campaigns"`
+	SuccessMsg string     `json:"success_msg,omitempty"`
+	ErrorMsg   string     `json:"error_msg,omitempty"`
+}
+
+
 
 
 

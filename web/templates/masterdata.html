@@ -1,0 +1,331 @@
+{{ define "content" }}
+<div class="dashboard-header" style="margin-bottom: 1.5rem;">
+  <div>
+    <h1 style="font-size: 1.75rem; font-weight: 700; color: var(--text-color, #ffffff); margin: 0 0 0.25rem 0;">
+      📁 {{ t .Lang "masterdata_title" }}
+    </h1>
+    <p style="color: var(--text-muted, #94a3b8); margin: 0; font-size: 0.95rem;">
+      {{ t .Lang "masterdata_subtitle" }}
+    </p>
+  </div>
+</div>
+
+{{ if .SuccessMsg }}
+<div class="alert alert-success" style="padding: 0.75rem 1rem; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; border-radius: 8px; margin-bottom: 1.5rem; font-weight: 500;">
+  ✓ {{ .SuccessMsg }}
+</div>
+{{ end }}
+
+{{ if .ErrorMsg }}
+<div class="alert alert-danger" style="padding: 0.75rem 1rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; border-radius: 8px; margin-bottom: 1.5rem; font-weight: 500;">
+  ⚠️ {{ .ErrorMsg }}
+</div>
+{{ end }}
+
+<!-- Sub-navigation tabs -->
+<div class="nav-tabs" style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.1)); padding-bottom: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+  <a href="/masterdata?tab=portal" class="nav-tab {{ if or (eq .ActiveTab "portal") (eq .ActiveTab "") }}active{{ end }}" data-testid="tab-portal-views">
+    {{ t .Lang "tab_portal_views" }}
+  </a>
+  <a href="/masterdata?tab=employees" class="nav-tab {{ if eq .ActiveTab "employees" }}active{{ end }}" data-testid="tab-employees">
+    {{ t .Lang "tab_employees" }}
+  </a>
+  <a href="/masterdata?tab=clients" class="nav-tab {{ if eq .ActiveTab "clients" }}active{{ end }}" data-testid="tab-clients">
+    {{ t .Lang "tab_clients" }}
+  </a>
+  <a href="/masterdata?tab=campaigns" class="nav-tab {{ if eq .ActiveTab "campaigns" }}active{{ end }}" data-testid="tab-campaigns">
+    {{ t .Lang "tab_campaigns" }}
+  </a>
+</div>
+
+{{ if or (eq .ActiveTab "portal") (eq .ActiveTab "") }}
+<!-- SECTION: Client Portal Links & PINs -->
+<div class="card" style="background: var(--card-bg, #1e293b); border: 1px solid var(--border-color, rgba(255,255,255,0.1)); border-radius: 12px; padding: 1.5rem;" data-testid="portal-views-section">
+  <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+    🔒 {{ t .Lang "tab_portal_views" }}
+  </h2>
+  
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem;">
+    {{ range .Clients }}
+    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <h3 style="margin: 0; font-size: 1.1rem; font-weight: 600; color: #60a5fa;">{{ .Name }}</h3>
+          <span style="background: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 0.25rem 0.6rem; border-radius: 6px; font-family: monospace; font-weight: 700; font-size: 1rem;">
+            PIN: {{ .PinCode }}
+          </span>
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">{{ t $.Lang "th_portal_link" }}:</label>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <input type="text" readonly value="/portal/c/{{ .PortalToken }}" id="portal-url-{{ .ID }}" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #e2e8f0; padding: 0.4rem 0.6rem; border-radius: 6px; font-family: monospace; font-size: 0.85rem;" />
+            <button type="button" onclick="navigator.clipboard.writeText(window.location.origin + '/portal/c/{{ .PortalToken }}'); alert('Link copied to clipboard!');" class="btn-subtle" style="padding: 0.4rem 0.75rem; white-space: nowrap;">
+              📋 {{ t $.Lang "btn_copy_link" }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid rgba(255,255,255,0.06); pt: 0.75rem; display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; padding-top: 0.75rem;">
+        <a href="/portal/c/{{ .PortalToken }}" target="_blank" class="btn-subtle" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem;">
+          🚀 Open Portal ↗
+        </a>
+
+        <!-- Quick PIN update form -->
+        <form hx-post="/api/masterdata/client/save" hx-target="#main-content" hx-swap="innerHTML" style="display: flex; align-items: center; gap: 0.4rem;">
+          <input type="hidden" name="id" value="{{ .ID }}">
+          <input type="hidden" name="name" value="{{ .Name }}">
+          <input type="hidden" name="portal_token" value="{{ .PortalToken }}">
+          <input type="hidden" name="active_tab" value="portal">
+          <input type="text" name="pin_code" value="{{ .PinCode }}" pattern="[0-9]{4}" maxlength="4" style="width: 65px; text-align: center; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 6px; padding: 0.3rem; font-family: monospace; font-weight: bold;" title="4-digit PIN" required>
+          <button type="submit" class="btn-subtle" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;">
+            💾 PIN
+          </button>
+        </form>
+      </div>
+    </div>
+    {{ end }}
+  </div>
+</div>
+{{ end }}
+
+{{ if eq .ActiveTab "employees" }}
+<!-- SECTION: Employees (Mitarbeiter) -->
+<div class="card" style="background: var(--card-bg, #1e293b); border: 1px solid var(--border-color, rgba(255,255,255,0.1)); border-radius: 12px; padding: 1.5rem;" data-testid="employees-section">
+  <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+    👥 {{ t .Lang "tab_employees" }}
+  </h2>
+
+  <!-- Table -->
+  <div style="overflow-x: auto; margin-bottom: 2rem;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+      <thead>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8; font-size: 0.85rem;">
+          <th style="padding: 0.75rem;">ID</th>
+          <th style="padding: 0.75rem;">{{ t .Lang "label_name" }}</th>
+          <th style="padding: 0.75rem;">{{ t .Lang "label_role" }}</th>
+          <th style="padding: 0.75rem;">{{ t .Lang "label_cost_rate" }}</th>
+          <th style="padding: 0.75rem;">{{ t .Lang "label_billing_rate" }}</th>
+          <th style="padding: 0.75rem; text-align: right;">{{ t .Lang "th_actions" }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range .Employees }}
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <td style="padding: 0.75rem; color: #64748b; font-family: monospace;">#{{ .ID }}</td>
+          <form hx-post="/api/masterdata/employee/save" hx-target="#main-content" hx-swap="innerHTML">
+            <input type="hidden" name="id" value="{{ .ID }}">
+            <input type="hidden" name="active_tab" value="employees">
+            <td style="padding: 0.75rem;">
+              <input type="text" name="name" value="{{ .Name }}" required style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0.3rem 0.5rem; border-radius: 6px; width: 100%;">
+            </td>
+            <td style="padding: 0.75rem;">
+              <input type="text" name="role" value="{{ .Role }}" required style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0.3rem 0.5rem; border-radius: 6px; width: 100%;">
+            </td>
+            <td style="padding: 0.75rem;">
+              <input type="number" step="0.5" name="cost_rate" value="{{ printf "%.2f" .CostRate }}" required style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0.3rem 0.5rem; border-radius: 6px; width: 90px;"> €
+            </td>
+            <td style="padding: 0.75rem;">
+              <input type="number" step="0.5" name="billing_rate" value="{{ printf "%.2f" .BillingRate }}" required style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0.3rem 0.5rem; border-radius: 6px; width: 90px;"> €
+            </td>
+            <td style="padding: 0.75rem; text-align: right; white-space: nowrap;">
+              <button type="submit" class="btn-subtle" style="padding: 0.3rem 0.6rem; margin-right: 0.4rem;">💾 {{ t $.Lang "btn_save" }}</button>
+              <button type="button" hx-post="/api/masterdata/employee/delete" hx-vals='{"id": {{ .ID }}}' hx-target="#main-content" hx-swap="innerHTML" hx-confirm="Mitarbeiter #{{ .ID }} wirklich löschen?" class="btn-subtle" style="color: #f87171; padding: 0.3rem 0.6rem;">🗑️ {{ t $.Lang "btn_delete" }}</button>
+            </td>
+          </form>
+        </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Add New Form -->
+  <div style="background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); border-radius: 8px; padding: 1.25rem;">
+    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #38bdf8;">➕ Neue(n) Mitarbeiter(in) anlegen</h3>
+    <form hx-post="/api/masterdata/employee/save" hx-target="#main-content" hx-swap="innerHTML" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) 120px; gap: 1rem; align-items: end;">
+      <input type="hidden" name="id" value="0">
+      <input type="hidden" name="active_tab" value="employees">
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">{{ t .Lang "label_name" }}</label>
+        <input type="text" name="name" placeholder="z.B. Julia Fischer" required style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 0.4rem 0.6rem; border-radius: 6px;">
+      </div>
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">{{ t .Lang "label_role" }}</label>
+        <input type="text" name="role" placeholder="z.B. Motion Artist" required style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 0.4rem 0.6rem; border-radius: 6px;">
+      </div>
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">{{ t .Lang "label_cost_rate" }}</label>
+        <input type="number" step="0.5" name="cost_rate" placeholder="50.0" required style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 0.4rem 0.6rem; border-radius: 6px;">
+      </div>
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">{{ t .Lang "label_billing_rate" }}</label>
+        <input type="number" step="0.5" name="billing_rate" placeholder="110.0" required style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 0.4rem 0.6rem; border-radius: 6px;">
+      </div>
+      <div>
+        <button type="submit" class="btn-subtle" style="width: 100%; background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); padding: 0.45rem;">
+          ✨ {{ t .Lang "btn_add" }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{{ end }}
+
+{{ if eq .ActiveTab "clients" }}
+<!-- SECTION: Clients (Kunden) -->
+<div class="card" style="background: var(--card-bg, #1e293b); border: 1px solid var(--border-color, rgba(255,255,255,0.1)); border-radius: 12px; padding: 1.5rem;" data-testid="clients-section">
+  <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+    🏢 {{ t .Lang "tab_clients" }}
+  </h2>
+
+  <!-- Table -->
+  <div style="overflow-x: auto; margin-bottom: 2rem;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+      <thead>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8; font-size: 0.85rem;">
+          <th style="padding: 0.75rem;">ID</th>
+          <th style="padding: 0.75rem;">{{ t .Lang "label_name" }}</th>
+          <th style="padding: 0.75rem;">{{ t .Lang "th_portal_token" }}</th>
+          <th style="padding: 0.75rem;">{{ t .Lang "th_pin_code" }}</th>
+          <th style="padding: 0.75rem; text-align: right;">{{ t .Lang "th_actions" }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range .Clients }}
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <td style="padding: 0.75rem; color: #64748b; font-family: monospace;">#{{ .ID }}</td>
+          <form hx-post="/api/masterdata/client/save" hx-target="#main-content" hx-swap="innerHTML">
+            <input type="hidden" name="id" value="{{ .ID }}">
+            <input type="hidden" name="active_tab" value="clients">
+            <td style="padding: 0.75rem;">
+              <input type="text" name="name" value="{{ .Name }}" required style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0.3rem 0.5rem; border-radius: 6px; width: 100%;">
+            </td>
+            <td style="padding: 0.75rem;">
+              <input type="text" name="portal_token" value="{{ .PortalToken }}" required style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0.3rem 0.5rem; border-radius: 6px; width: 100%; font-family: monospace;">
+            </td>
+            <td style="padding: 0.75rem;">
+              <input type="text" name="pin_code" value="{{ .PinCode }}" pattern="[0-9]{4}" maxlength="4" required style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0.3rem 0.5rem; border-radius: 6px; width: 70px; font-family: monospace; text-align: center;">
+            </td>
+            <td style="padding: 0.75rem; text-align: right; white-space: nowrap;">
+              <button type="submit" class="btn-subtle" style="padding: 0.3rem 0.6rem; margin-right: 0.4rem;">💾 {{ t $.Lang "btn_save" }}</button>
+              <button type="button" hx-post="/api/masterdata/client/delete" hx-vals='{"id": {{ .ID }}}' hx-target="#main-content" hx-swap="innerHTML" hx-confirm="Kunde #{{ .ID }} wirklich löschen? Alle zugehörigen Kampagnen werden ebenfalls gelöscht." class="btn-subtle" style="color: #f87171; padding: 0.3rem 0.6rem;">🗑️ {{ t $.Lang "btn_delete" }}</button>
+            </td>
+          </form>
+        </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Add New Form -->
+  <div style="background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); border-radius: 8px; padding: 1.25rem;">
+    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #38bdf8;">➕ Neuen Kunden anlegen</h3>
+    <form hx-post="/api/masterdata/client/save" hx-target="#main-content" hx-swap="innerHTML" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) 120px; gap: 1rem; align-items: end;">
+      <input type="hidden" name="id" value="0">
+      <input type="hidden" name="active_tab" value="clients">
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">{{ t .Lang "label_name" }}</label>
+        <input type="text" name="name" placeholder="z.B. BMW Group" required style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 0.4rem 0.6rem; border-radius: 6px;">
+      </div>
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">{{ t .Lang "th_portal_token" }}</label>
+        <input type="text" name="portal_token" placeholder="bmw-group-7721" required style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 0.4rem 0.6rem; border-radius: 6px; font-family: monospace;">
+      </div>
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">{{ t .Lang "th_pin_code" }}</label>
+        <input type="text" name="pin_code" placeholder="4321" pattern="[0-9]{4}" maxlength="4" required style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 0.4rem 0.6rem; border-radius: 6px; font-family: monospace; text-align: center;">
+      </div>
+      <div>
+        <button type="submit" class="btn-subtle" style="width: 100%; background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); padding: 0.45rem;">
+          ✨ {{ t .Lang "btn_add" }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{{ end }}
+
+{{ if eq .ActiveTab "campaigns" }}
+<!-- SECTION: Campaigns (Kampagnen) -->
+<div class="card" style="background: var(--card-bg, #1e293b); border: 1px solid var(--border-color, rgba(255,255,255,0.1)); border-radius: 12px; padding: 1.5rem;" data-testid="campaigns-section">
+  <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+    🎯 {{ t .Lang "tab_campaigns" }}
+  </h2>
+
+  <!-- Table -->
+  <div style="overflow-x: auto; margin-bottom: 2rem;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+      <thead>
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: #94a3b8; font-size: 0.85rem;">
+          <th style="padding: 0.75rem;">ID</th>
+          <th style="padding: 0.75rem;">{{ t .Lang "label_client" }}</th>
+          <th style="padding: 0.75rem;">{{ t .Lang "label_name" }}</th>
+          <th style="padding: 0.75rem;">{{ t .Lang "label_target_budget" }}</th>
+          <th style="padding: 0.75rem; text-align: right;">{{ t .Lang "th_actions" }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{ range .Campaigns }}
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <td style="padding: 0.75rem; color: #64748b; font-family: monospace;">#{{ .ID }}</td>
+          <form hx-post="/api/masterdata/campaign/save" hx-target="#main-content" hx-swap="innerHTML">
+            <input type="hidden" name="id" value="{{ .ID }}">
+            <input type="hidden" name="active_tab" value="campaigns">
+            <td style="padding: 0.75rem;">
+              <select name="client_id" required style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0.3rem 0.5rem; border-radius: 6px; width: 100%;">
+                {{ $currClientID := .ClientID }}
+                {{ range $.Clients }}
+                <option value="{{ .ID }}" {{ if eq .ID $currClientID }}selected{{ end }}>{{ .Name }}</option>
+                {{ end }}
+              </select>
+            </td>
+            <td style="padding: 0.75rem;">
+              <input type="text" name="name" value="{{ .Name }}" required style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0.3rem 0.5rem; border-radius: 6px; width: 100%;">
+            </td>
+            <td style="padding: 0.75rem;">
+              <input type="number" step="100" name="target_budget" value="{{ printf "%.2f" .TargetBudget }}" required style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 0.3rem 0.5rem; border-radius: 6px; width: 120px;"> €
+            </td>
+            <td style="padding: 0.75rem; text-align: right; white-space: nowrap;">
+              <button type="submit" class="btn-subtle" style="padding: 0.3rem 0.6rem; margin-right: 0.4rem;">💾 {{ t $.Lang "btn_save" }}</button>
+              <button type="button" hx-post="/api/masterdata/campaign/delete" hx-vals='{"id": {{ .ID }}}' hx-target="#main-content" hx-swap="innerHTML" hx-confirm="Kampagne #{{ .ID }} wirklich löschen?" class="btn-subtle" style="color: #f87171; padding: 0.3rem 0.6rem;">🗑️ {{ t $.Lang "btn_delete" }}</button>
+            </td>
+          </form>
+        </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Add New Form -->
+  <div style="background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.15); border-radius: 8px; padding: 1.25rem;">
+    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #38bdf8;">➕ Neue Kampagne anlegen</h3>
+    <form hx-post="/api/masterdata/campaign/save" hx-target="#main-content" hx-swap="innerHTML" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) 120px; gap: 1rem; align-items: end;">
+      <input type="hidden" name="id" value="0">
+      <input type="hidden" name="active_tab" value="campaigns">
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">{{ t .Lang "label_client" }}</label>
+        <select name="client_id" required style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 0.4rem 0.6rem; border-radius: 6px;">
+          {{ range .Clients }}
+          <option value="{{ .ID }}">{{ .Name }}</option>
+          {{ end }}
+        </select>
+      </div>
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">{{ t .Lang "label_name" }}</label>
+        <input type="text" name="name" placeholder="z.B. Winter Launch Campaign" required style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 0.4rem 0.6rem; border-radius: 6px;">
+      </div>
+      <div>
+        <label style="display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">{{ t .Lang "label_target_budget" }}</label>
+        <input type="number" step="500" name="target_budget" placeholder="15000" required style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 0.4rem 0.6rem; border-radius: 6px;">
+      </div>
+      <div>
+        <button type="submit" class="btn-subtle" style="width: 100%; background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); padding: 0.45rem;">
+          ✨ {{ t .Lang "btn_add" }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{{ end }}
+{{ end }}

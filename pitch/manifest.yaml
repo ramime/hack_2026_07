@@ -1,5 +1,5 @@
 # OWNER: Dev-Agent only — see pitch/DEV_AGENT_CONTRACT.md
-version: "0.5.2"
+version: "0.7.1"
 updated_at: "2026-07-25"
 
 features:
@@ -81,6 +81,41 @@ features:
         - "[data-testid='portal-content']"
       notes_en: "Open /portal/c/ritter-sport-8821, enter PIN 1234, show portal content."
 
+  - id: security_fraud
+    title_en: "Security & Fraud + n8n"
+    summary_en: "DevTeam live status, simulated attacks, webhook alerts."
+    slide_bullets_en:
+      - "PIN brute-force and invalid link scan detection"
+      - "Budget-drift alerts via n8n webhooks"
+      - "Live audit log on /dev/status"
+    route: "/dev/status"
+    status: shipped
+    demo:
+      reset_required: true
+      entrypoints:
+        - "[data-testid='dev-status-kpis']"
+        - "[data-testid='sim-brute-force-button']"
+        - "[data-testid='security-logs-table']"
+      notes_en: "Open /dev/status; click simulate brute-force; show log."
+
+  - id: masterdata_management
+    title_en: "Master Data & Client PINs"
+    summary_en: "Complete CRUD for employees, clients, campaigns, and client portal links with PINs."
+    slide_bullets_en:
+      - "Overview of client portal links and PIN codes with quick copy and inline update"
+      - "Full editing for employees, cost/billing rates, clients, and campaign targets"
+    route: "/masterdata"
+    status: shipped
+    demo:
+      reset_required: true
+      entrypoints:
+        - "[data-testid='nav-masterdata']"
+        - "[data-testid='portal-views-section']"
+        - "[data-testid='tab-employees']"
+        - "[data-testid='tab-clients']"
+        - "[data-testid='tab-campaigns']"
+      notes_en: "Open /masterdata; view client PINs; manage employees/clients/campaigns."
+
   - id: demo_reset
     title_en: "One-Click Demo Reset"
     summary_en: "Restore the pitch baseline after live tinkering."
@@ -93,3 +128,4 @@ features:
       entrypoints:
         - "[data-testid='reset-demo-button']"
       notes_en: "Click reset."
+

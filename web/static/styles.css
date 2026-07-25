@@ -291,12 +291,14 @@ th {
   letter-spacing: 0.05em;
   color: var(--text-muted);
   border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
 }
 
 td {
   padding: 1rem;
   border-bottom: 1px solid var(--table-border);
   font-size: 0.925rem;
+  white-space: nowrap;
 }
 
 tr:last-child td {

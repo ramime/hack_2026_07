@@ -121,11 +121,31 @@ updating `manifest.yaml` → `demo.entrypoints`.
 
 Seed demo tokens must stay stable for screencasts (e.g. Ritter `ritter-sport-8821` / PIN `1234`).
 
-### Add when later features ship
+### Required for v0.7 Master Data (`/masterdata`)
 
-| `data-testid` | Feature |
+| `data-testid` | Element |
 |---------------|---------|
-| `dev-status-panel` | `/dev/status` security dashboard |
+| `nav-masterdata` | Header nav link |
+| `tab-portal-views` | Portal views & PINs tab |
+| `tab-employees` | Employees tab |
+| `tab-clients` | Clients tab |
+| `tab-campaigns` | Campaigns tab |
+| `portal-views-section` | Client portal link/PIN overview |
+| `employees-section` | Employee CRUD section |
+| `clients-section` | Client CRUD section |
+| `campaigns-section` | Campaign CRUD section |
+
+### Required for v0.6 Security (`/dev/status`)
+
+| `data-testid` | Element |
+|---------------|---------|
+| `dev-status-kpis` | System status KPI strip |
+| `dev-simulations-bar` | Simulation button group |
+| `sim-brute-force-button` | Simulate PIN brute-force |
+| `sim-link-scan-button` | Simulate invalid link scan |
+| `sim-budget-drift-button` | Simulate budget-drift alert |
+| `security-logs-table` | Live audit log table |
+| `n8n-url-input` | n8n webhook URL field |
 
 ---
 

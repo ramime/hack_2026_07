@@ -115,7 +115,29 @@
   "th_status": "Status",
   "th_details": "Details",
   "th_time": "Timestamp",
+  "nav_masterdata": "Master Data",
+  "masterdata_title": "Master Data & Client Portal PINs",
+  "masterdata_subtitle": "Manage employees, clients, campaigns, and access links",
+  "tab_portal_views": "🔒 Client Views & PINs",
+  "tab_employees": "👥 Employees",
+  "tab_clients": "🏢 Clients",
+  "tab_campaigns": "🎯 Campaigns",
+  "btn_add": "Add New",
+  "btn_save": "Save",
+  "btn_delete": "Delete",
+  "btn_copy_link": "Copy Link",
+  "th_actions": "Actions",
+  "th_pin_code": "PIN Code",
+  "th_portal_token": "Portal Token",
+  "th_portal_link": "Client Portal Link",
+  "label_name": "Name",
+  "label_role": "Role",
+  "label_cost_rate": "Cost Rate (€/h)",
+  "label_billing_rate": "Billing Rate (€/h)",
+  "label_client": "Client",
+  "label_target_budget": "Target Budget (€)",
   "portal_locked_out": "Access temporarily locked due to multiple failed PIN attempts."
 }
+
 
 

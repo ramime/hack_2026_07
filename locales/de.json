@@ -115,7 +115,29 @@
   "th_status": "Status",
   "th_details": "Details",
   "th_time": "Zeitpunkt",
+  "nav_masterdata": "Stammdaten",
+  "masterdata_title": "Stammdaten-Verwaltung & Kunden-PINs",
+  "masterdata_subtitle": "Mitarbeiter, Kunden, Kampagnen und Zugangslinks verwalten",
+  "tab_portal_views": "🔒 Kundenansichten & PINs",
+  "tab_employees": "👥 Mitarbeiter",
+  "tab_clients": "🏢 Kunden",
+  "tab_campaigns": "🎯 Kampagnen",
+  "btn_add": "Neu anlegen",
+  "btn_save": "Speichern",
+  "btn_delete": "Löschen",
+  "btn_copy_link": "Link kopieren",
+  "th_actions": "Aktionen",
+  "th_pin_code": "PIN-Code",
+  "th_portal_token": "Portal-Token",
+  "th_portal_link": "Kunden-Portal Link",
+  "label_name": "Name",
+  "label_role": "Rolle",
+  "label_cost_rate": "Kostensatz (€/h)",
+  "label_billing_rate": "Abrechnungssatz (€/h)",
+  "label_client": "Kunde",
+  "label_target_budget": "Ziel-Budget (€)",
   "portal_locked_out": "Zugriff vorübergehend gesperrt wegen zu vieler fehlerhafter PIN-Eingaben."
 }
+
 
 

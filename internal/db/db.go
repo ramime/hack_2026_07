@@ -323,4 +323,112 @@ func (db *DB) GetSecurityLogs(limit int) ([]models.SecurityLog, error) {
 	return logs, nil
 }
 
+// Client CRUD
+func (db *DB) GetAllClients() ([]models.Client, error) {
+	rows, err := db.Query("SELECT id, name, portal_token, pin_code, created_at FROM clients ORDER BY name ASC")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var clients []models.Client
+	for rows.Next() {
+		var c models.Client
+		if err := rows.Scan(&c.ID, &c.Name, &c.PortalToken, &c.PinCode, &c.CreatedAt); err != nil {
+			return nil, err
+		}
+		clients = append(clients, c)
+	}
+	return clients, nil
+}
+
+func (db *DB) CreateClient(name, portalToken, pinCode string) error {
+	_, err := db.Exec("INSERT INTO clients (name, portal_token, pin_code) VALUES (?, ?, ?)", name, portalToken, pinCode)
+	return err
+}
+
+func (db *DB) UpdateClient(id int64, name, portalToken, pinCode string) error {
+	_, err := db.Exec("UPDATE clients SET name = ?, portal_token = ?, pin_code = ? WHERE id = ?", name, portalToken, pinCode, id)
+	return err
+}
+
+func (db *DB) DeleteClient(id int64) error {
+	_, err := db.Exec("DELETE FROM clients WHERE id = ?", id)
+	return err
+}
+
+// Employee CRUD
+func (db *DB) GetAllEmployees() ([]models.Employee, error) {
+	rows, err := db.Query("SELECT id, name, role, hourly_rate, cost_rate, billing_rate, created_at FROM employees ORDER BY name ASC")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var employees []models.Employee
+	for rows.Next() {
+		var e models.Employee
+		if err := rows.Scan(&e.ID, &e.Name, &e.Role, &e.HourlyRate, &e.CostRate, &e.BillingRate, &e.CreatedAt); err != nil {
+			return nil, err
+		}
+		employees = append(employees, e)
+	}
+	return employees, nil
+}
+
+func (db *DB) CreateEmployee(name, role string, hourlyRate, costRate, billingRate float64) error {
+	_, err := db.Exec("INSERT INTO employees (name, role, hourly_rate, cost_rate, billing_rate) VALUES (?, ?, ?, ?, ?)", name, role, hourlyRate, costRate, billingRate)
+	return err
+}
+
+func (db *DB) UpdateEmployee(id int64, name, role string, hourlyRate, costRate, billingRate float64) error {
+	_, err := db.Exec("UPDATE employees SET name = ?, role = ?, hourly_rate = ?, cost_rate = ?, billing_rate = ? WHERE id = ?", name, role, hourlyRate, costRate, billingRate, id)
+	return err
+}
+
+func (db *DB) DeleteEmployee(id int64) error {
+	_, err := db.Exec("DELETE FROM employees WHERE id = ?", id)
+	return err
+}
+
+// Campaign CRUD
+func (db *DB) GetAllCampaigns() ([]models.Campaign, error) {
+	rows, err := db.Query(`
+		SELECT c.id, c.client_id, cl.name as client_name, c.name, c.target_budget, c.created_at
+		FROM campaigns c
+		JOIN clients cl ON c.client_id = cl.id
+		ORDER BY c.name ASC
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var campaigns []models.Campaign
+	for rows.Next() {
+		var cmp models.Campaign
+		if err := rows.Scan(&cmp.ID, &cmp.ClientID, &cmp.ClientName, &cmp.Name, &cmp.TargetBudget, &cmp.CreatedAt); err != nil {
+			return nil, err
+		}
+		campaigns = append(campaigns, cmp)
+	}
+	return campaigns, nil
+}
+
+func (db *DB) CreateCampaign(clientID int64, name string, targetBudget float64) error {
+	_, err := db.Exec("INSERT INTO campaigns (client_id, name, target_budget) VALUES (?, ?, ?)", clientID, name, targetBudget)
+	return err
+}
+
+func (db *DB) UpdateCampaign(id int64, clientID int64, name string, targetBudget float64) error {
+	_, err := db.Exec("UPDATE campaigns SET client_id = ?, name = ?, target_budget = ? WHERE id = ?", clientID, name, targetBudget, id)
+	return err
+}
+
+func (db *DB) DeleteCampaign(id int64) error {
+	_, err := db.Exec("DELETE FROM campaigns WHERE id = ?", id)
+	return err
+}
+
+
 

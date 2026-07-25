@@ -1,7 +1,8 @@
 # OWNER: Pitch Media pipeline ONLY
-# Screencast for v0.5.2 — domain focus, ≤2 minutes
+# Screencast for v0.7.0-beta — master data + domain story
+# Captions: solid black plate for readability
 
-version: "0.5.2"
+version: "0.7.0-beta.1"
 lang: en
 viewport:
   width: 1280
@@ -11,80 +12,48 @@ scenes:
   - id: intro
     path: "/"
     max_seconds: 4
-    narration_en: "AgencyPulse — see budget drift before it hits the client."
+    narration_en: "AgencyPulse — budget pulse, portals, and master data for agencies."
     steps: []
-
-  - id: time_entry
-    path: "/"
-    max_seconds: 12
-    narration_en: "Staff log time against campaigns. The ledger updates instantly."
-    steps:
-      - action: set_caption
-      - action: select
-        testid: employee-select
-        label_contains: "Sarah"
-      - action: select
-        testid: campaign-select
-        label_contains: "Ritter"
-      - action: fill
-        testid: hours-input
-        value: "1.5"
-      - action: fill
-        testid: description-input
-        value: "Storyboard review"
-      - action: click
-        testid: submit-time-log
-      - action: wait
-        ms: 800
 
   - id: teamlead_heatmap
     path: "/teamlead"
-    max_seconds: 14
-    narration_en: "Team Lead heatmap: Ritter healthy, Bosch at risk, Porsche over budget."
+    max_seconds: 11
+    narration_en: "Budget heatmap: Ritter healthy, Bosch at risk, Porsche over budget."
     steps:
       - action: set_caption
       - action: wait
         testid: budget-heatmap
+        ms: 2000
+
+  - id: masterdata_pins
+    path: "/masterdata?tab=portal"
+    max_seconds: 14
+    narration_en: "Master data: portal links and PINs for every client, ready to share."
+    steps:
+      - action: set_caption
+      - action: wait
+        testid: portal-views-section
         ms: 2400
 
-  - id: executive
-    path: "/executive"
-    max_seconds: 11
-    narration_en: "Executive view: revenue, labor cost, profit, and agency margin."
+  - id: masterdata_employees
+    path: "/masterdata?tab=employees"
+    max_seconds: 10
+    narration_en: "Employees with cost and billing rates — editable in one place."
     steps:
       - action: set_caption
       - action: wait
-        testid: executive-kpis
-        ms: 2200
-
-  - id: kiosk
-    path: "/tracker"
-    max_seconds: 14
-    narration_en: "Floor kiosk: start and stop live timers on touch campaign cards."
-    steps:
-      - action: set_caption
-      - action: wait
-        testid: kiosk-start-btn
-        ms: 500
-      - action: click
-        testid: kiosk-start-btn
-      - action: wait
-        testid: kiosk-stop-btn
+        testid: employees-section
         ms: 1800
-      - action: click
-        testid: kiosk-stop-btn
-      - action: wait
-        ms: 700
 
   - id: client_portal
     path: "/portal/c/ritter-sport-8821"
-    max_seconds: 16
-    narration_en: "Client portal: PIN gate, then transparent budgets without internal rates."
+    max_seconds: 14
+    narration_en: "Client portal: PIN unlock, then transparent budgets without internal rates."
     steps:
       - action: set_caption
       - action: wait
         testid: portal-pin-form
-        ms: 600
+        ms: 500
       - action: fill
         testid: portal-pin-input
         value: "1234"
@@ -92,7 +61,7 @@ scenes:
         testid: portal-submit-pin
       - action: wait
         testid: portal-content
-        ms: 2200
+        ms: 1800
 
   - id: reset
     path: "/teamlead"

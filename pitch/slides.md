@@ -1,40 +1,32 @@
 <!--
   OWNER: Pitch Media pipeline ONLY
-  Target: v0.5.2 — few domain-focused slides with UI screenshots
+  Target: v0.7.0-beta — Master Data + prior domain story
 -->
 
 # AgencyPulse
 
-See budget drift before it hits the client.
+Budget pulse, client portals, and master data — one agency cockpit.
 
 ---
 
 # Budget drift, live
 
-Green, warning, danger — campaign spend against target in one cockpit.
+Traffic-light spend vs target. Catch overruns before the client does.
 
 ![Team Lead budget heatmap](/static/pitch/heatmap.png)
 
 ---
 
-# Margins at a glance
+# Master data & portal PINs
 
-Revenue, labor cost, profit, and agency margin for owners.
+Manage employees, clients, campaigns — and hand out portal links with PINs.
 
-![Executive profitability KPIs](/static/pitch/executive.png)
+![Master data portal views](/static/pitch/masterdata.png)
 
 ---
 
 # Client transparency
 
-Opaque portal link + PIN. Budgets and delivered assets — no internal rates.
+Opaque URL + PIN. Budgets and assets — no internal rates.
 
-![Client portal after PIN unlock](/static/pitch/portal.png)
-
----
-
-# Studio floor
-
-800×480 kiosk: start/stop timers on campaign cards.
-
-![Hardware kiosk tracker](/static/pitch/kiosk.png)
+![Client portal](/static/pitch/portal.png)

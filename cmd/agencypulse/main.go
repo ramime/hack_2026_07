@@ -20,7 +20,7 @@ import (
 	"agencypulse/internal/tts"
 )
 
-const version = "0.6.0"
+const version = "0.7.1"
 
 
 
@@ -124,6 +124,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to parse dev_status templates: %v", err)
 	}
+
+	masterdataTmpl, err := template.New("layout.html").Funcs(funcMap).ParseFiles("web/templates/layout.html", "web/templates/masterdata.html")
+	if err != nil {
+		log.Fatalf("Failed to parse masterdata templates: %v", err)
+	}
+
 
 
 	// Static file handler
@@ -661,8 +667,204 @@ func main() {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	})
 
+	// Helper for Master Data Page Data
+	fetchMasterDataPageData := func(lang, tab, successMsg, errorMsg string) (*models.MasterDataPageData, error) {
+		clients, err := database.GetAllClients()
+		if err != nil {
+			return nil, err
+		}
+		employees, err := database.GetAllEmployees()
+		if err != nil {
+			return nil, err
+		}
+		campaigns, err := database.GetAllCampaigns()
+		if err != nil {
+			return nil, err
+		}
+		if tab == "" {
+			tab = "portal"
+		}
+		return &models.MasterDataPageData{
+			Version:    version,
+			Lang:       lang,
+			ActiveNav:  "masterdata",
+			ActiveTab:  tab,
+			Clients:    clients,
+			Employees:  employees,
+			Campaigns:  campaigns,
+			SuccessMsg: successMsg,
+			ErrorMsg:   errorMsg,
+		}, nil
+	}
+
+	renderMasterDataPage := func(w http.ResponseWriter, r *http.Request, tab, successMsg, errorMsg string) {
+		lang := getLang(r)
+		data, err := fetchMasterDataPageData(lang, tab, successMsg, errorMsg)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if err := masterdataTmpl.ExecuteTemplate(w, "layout.html", data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+
+	// Route: GET /masterdata
+	http.HandleFunc("/masterdata", func(w http.ResponseWriter, r *http.Request) {
+		tab := r.URL.Query().Get("tab")
+		renderMasterDataPage(w, r, tab, "", "")
+	})
+
+	// Route: POST /api/masterdata/employee/save
+	http.HandleFunc("/api/masterdata/employee/save", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
+		name := strings.TrimSpace(r.FormValue("name"))
+		role := strings.TrimSpace(r.FormValue("role"))
+		costRate, _ := strconv.ParseFloat(r.FormValue("cost_rate"), 64)
+		billingRate, _ := strconv.ParseFloat(r.FormValue("billing_rate"), 64)
+		tab := r.FormValue("active_tab")
+		if tab == "" {
+			tab = "employees"
+		}
+
+		if name == "" || role == "" {
+			renderMasterDataPage(w, r, tab, "", "Name und Rolle dürfen nicht leer sein.")
+			return
+		}
+
+		var err error
+		if id > 0 {
+			err = database.UpdateEmployee(id, name, role, billingRate, costRate, billingRate)
+		} else {
+			err = database.CreateEmployee(name, role, billingRate, costRate, billingRate)
+		}
+		if err != nil {
+			renderMasterDataPage(w, r, tab, "", "Fehler beim Speichern: "+err.Error())
+			return
+		}
+		renderMasterDataPage(w, r, tab, "Mitarbeiter erfolgreich gespeichert!", "")
+	})
+
+	// Route: POST /api/masterdata/employee/delete
+	http.HandleFunc("/api/masterdata/employee/delete", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
+		if id > 0 {
+			if err := database.DeleteEmployee(id); err != nil {
+				renderMasterDataPage(w, r, "employees", "", "Fehler beim Löschen: "+err.Error())
+				return
+			}
+		}
+		renderMasterDataPage(w, r, "employees", "Mitarbeiter gelöscht!", "")
+	})
+
+	// Route: POST /api/masterdata/client/save
+	http.HandleFunc("/api/masterdata/client/save", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
+		name := strings.TrimSpace(r.FormValue("name"))
+		portalToken := strings.TrimSpace(r.FormValue("portal_token"))
+		pinCode := strings.TrimSpace(r.FormValue("pin_code"))
+		tab := r.FormValue("active_tab")
+		if tab == "" {
+			tab = "clients"
+		}
+
+		if name == "" || portalToken == "" || len(pinCode) != 4 {
+			renderMasterDataPage(w, r, tab, "", "Kundenname, Portal-Token und ein 4-stelliger PIN-Code sind erforderlich.")
+			return
+		}
+
+		var err error
+		if id > 0 {
+			err = database.UpdateClient(id, name, portalToken, pinCode)
+		} else {
+			err = database.CreateClient(name, portalToken, pinCode)
+		}
+		if err != nil {
+			renderMasterDataPage(w, r, tab, "", "Fehler beim Speichern: "+err.Error())
+			return
+		}
+		renderMasterDataPage(w, r, tab, "Kunde & PIN erfolgreich gespeichert!", "")
+	})
+
+	// Route: POST /api/masterdata/client/delete
+	http.HandleFunc("/api/masterdata/client/delete", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
+		if id > 0 {
+			if err := database.DeleteClient(id); err != nil {
+				renderMasterDataPage(w, r, "clients", "", "Fehler beim Löschen: "+err.Error())
+				return
+			}
+		}
+		renderMasterDataPage(w, r, "clients", "Kunde gelöscht!", "")
+	})
+
+	// Route: POST /api/masterdata/campaign/save
+	http.HandleFunc("/api/masterdata/campaign/save", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
+		clientID, _ := strconv.ParseInt(r.FormValue("client_id"), 10, 64)
+		name := strings.TrimSpace(r.FormValue("name"))
+		targetBudget, _ := strconv.ParseFloat(r.FormValue("target_budget"), 64)
+		tab := r.FormValue("active_tab")
+		if tab == "" {
+			tab = "campaigns"
+		}
+
+		if clientID <= 0 || name == "" || targetBudget <= 0 {
+			renderMasterDataPage(w, r, tab, "", "Kunde, Name und ein gültiges Zielbudget sind erforderlich.")
+			return
+		}
+
+		var err error
+		if id > 0 {
+			err = database.UpdateCampaign(id, clientID, name, targetBudget)
+		} else {
+			err = database.CreateCampaign(clientID, name, targetBudget)
+		}
+		if err != nil {
+			renderMasterDataPage(w, r, tab, "", "Fehler beim Speichern: "+err.Error())
+			return
+		}
+		renderMasterDataPage(w, r, tab, "Kampagne erfolgreich gespeichert!", "")
+	})
+
+	// Route: POST /api/masterdata/campaign/delete
+	http.HandleFunc("/api/masterdata/campaign/delete", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		id, _ := strconv.ParseInt(r.FormValue("id"), 10, 64)
+		if id > 0 {
+			if err := database.DeleteCampaign(id); err != nil {
+				renderMasterDataPage(w, r, "campaigns", "", "Fehler beim Löschen: "+err.Error())
+				return
+			}
+		}
+		renderMasterDataPage(w, r, "campaigns", "Kampagne gelöscht!", "")
+	})
 
 	// Route: Client Portal (/portal/c/{token})
+
 	http.HandleFunc("/portal/c/", func(w http.ResponseWriter, r *http.Request) {
 		path := strings.TrimPrefix(r.URL.Path, "/portal/c/")
 		parts := strings.Split(strings.Trim(path, "/"), "/")
